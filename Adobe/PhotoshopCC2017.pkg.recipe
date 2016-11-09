@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Download the latest update for the specified major release of Lightroom</string>
+    <key>Identifier</key>
+    <string>com.github.mosen.pkg.PhotoshopCC2017</string>
+    <key>Input</key>
+    <dict>
+        <key>developer</key>
+        <string>Adobe</string>
+    </dict>
+    <key>MinimumVersion</key>
+    <string>0.2.0</string>
+    <key>Process</key>
+    <array>
+        <dict>
+            <key>Processor</key>
+            <string>CreativeCloudFeed</string>
+            <key>Arguments</key>
+            <dict>
+                <key>product_id</key>
+                <string>PHSP</string>
+                <key>base_version</key>
+                <string>18.0</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>
