@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright 2016 Mosen
+#                Tim Sutton
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +21,9 @@ import urllib2
 from urllib import urlencode
 from distutils.version import LooseVersion as LV
 
+# for debugging
+from pprint import pprint
+
 from autopkglib import Processor, ProcessorError
 
 __all__ = ["CreativeCloudFeed"]
@@ -34,22 +38,30 @@ class CreativeCloudFeed(Processor):
     input_variables = {
         "product_id": {
             "required": True,
-            "description": "The product sap code"
+            "description": "The product sap code",
         },
         "base_version": {
             "required": True,
-            "description": "The base product version"
+            "description": "The base product version",
+        },
+        "version": {
+            "required": False,
+            "default": "latest",
+            "description": ("Either 'latest' or a specific product version. "
+                            "Currently only supports 'latest', which will ."
+                            "return the highest version within this base "
+                            "product."),
         },
         "channels": {
             "required": False,
             "default": "ccm",
-            "description": "The update feed channel(s), comma separated. (default is ccm)"
+            "description": "The update feed channel(s), comma separated. (default is ccm)",
         },
         "platforms": {
             "required": False,
             "default": "osx10,osx10-64",
-            "desription": "The deployment platform(s), comma separated. (default is osx10,osx10-64)"
-        }
+            "desription": "The deployment platform(s), comma separated. (default is osx10,osx10-64)",
+        },
     }
 
     output_variables = {
@@ -130,9 +142,15 @@ class CreativeCloudFeed(Processor):
                     continue
 
                 #  self.output('check if version: {} is greater than newest found product: {}'.format(prod['version'], product['version']))
-                if LV(prod['version']) > LV(product['version']):
-                    product = prod
-
+                if self.env["version"] == "latest":
+                    if LV(prod['version']) > LV(product['version']):
+                        product = prod
+                #  TODO: sanity check whether a specific version actually exists within the available products
+                #        (may require refactoring this loop)
+                else:
+                    if prod['version'] == self.env["version"]:
+                        product = prod
+        
         first_platform = {}
         for platform in product['platforms']['platform']:
             if platform['id'] in platforms:
@@ -147,16 +165,13 @@ class CreativeCloudFeed(Processor):
         compatibility_range = first_platform['systemCompatibility']['operatingSystem']['range'][0]
 
         # output variable naming has been kept as close to pkginfo names as possible in order to feed munkiimport
+        
+        # TODO: sanity-check this "systemCompatibility range" value
         self.env['minimum_os_version'] = compatibility_range.split('-')[0]
         self.env['product_info_url'] = product.get('productInfoPage')
         self.env['version'] = product.get('version')
         self.env['display_name'] = product.get('displayName')
 
-
-
-
-
 if __name__ == "__main__":
     processor = CreativeCloudFeed()
     processor.execute_shell()
-

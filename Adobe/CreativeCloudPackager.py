@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright 2016 Mosen
+#                Tim Sutton
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import subprocess
+
+from glob import glob
+from string import Template
+from tempfile import mkstemp
+from xml.etree import ElementTree
+
 from autopkglib import Processor, ProcessorError
 
 __all__ = ["CreativeCloudPackager"]
 
 # https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html
+#
+# https://github.com/timsutton/adobe-ccp-automation/blob/master/ccp_auto
 
 TEMPLATE_XML = """<CCPPackage>
   <CreatePackage>
@@ -27,7 +38,7 @@ TEMPLATE_XML = """<CCPPackage>
     <outputLocation>${output_location}</outputLocation>
     <is64Bit>true</is64Bit>
     <customerType>enterprise</customerType>
-    <organizationName>Concordia University, Quebec</organizationName>
+    <organizationName>${organization_name}</organizationName>
     <!-- ProductCategory should be left 'Custom' -->
     <ProductCategory>Custom</ProductCategory>
     <matchOSLanguage>true</matchOSLanguage>
@@ -51,56 +62,116 @@ TEMPLATE_XML = """<CCPPackage>
 
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
-    description = __doc__
+    description = "Runs the CCP packager."
     input_variables = {
         "package_name": {
-            "required": True,
-            "description": "The output package name"
+            "required": False,
+            "description": "The output package name",
         },
         "customer_type": {
-            "required": True,
-            "description": "The license type 'enterprise' or 'team'"
+            "required": False,
+            "default": "enterprise",
+            "description": "The license type 'enterprise' or 'team'",
         },
         "organization_name": {
             "required": True,
-            "description": "The organization name which must match your licensed organization."
+            "description": "The organization name which must match your licensed organization.",
         },
         "serial_number": {
             "required": False,
-            "description": "The serial number, if you are using serialized packages."
+            "description": "The serial number, if you are using serialized packages.",
         },
         "include_updates": {
             "required": False,
             "default": True,
-            "description": "Include all available updates, defaults to true."
+            "description": "Include all available updates, defaults to true.",
         },
         "language": {
-            "required": True,
+            "required": False,
             "default": "en_US",
-            "description": "The language to build, defaults to en_US."
+            "description": "The language to build, defaults to en_US.",
         },
         "rum_enabled": {
             "required": False,
             "default": True,
-            "description": "Include RUM in the package"
+            "description": "Include RUM in the package",
         },
         "updates_enabled": {
             "required": False,
             "default": True,
-            "description": "Enable updates"
+            "description": "Enable updates",
         },
         "apps_panel_enabled": {
             "required": False,
             "default": True,
-            "description": "Enable access to the apps panel in the desktop application"
+            "description": "Enable access to the apps panel in the desktop application",
         },
         "admin_privileges_enabled": {
             "required": False,
             "default": False,
-            "description": "Allow the desktop application to run in privileged mode, so that standard users may install apps."
-        }
+            "description": "Allow the desktop application to run in privileged mode, so that standard users may install apps.",
+        },
     }
 
     output_variables = {
-
+        "pkg_path": {
+            "description": "Path to the built bundle-style CCP installer pkg.",
+        },
+        "uninstaller_pkg_path": {
+            "description": "Path to the built bundle-style CCP uninstaller pkg.",
+        },
     }
+    
+
+    def main(self):
+        # Handle any pre-existing package at the expected location, and end early if it matches our
+        # input manifest
+        # TODO: for now we just continue on if the dir already exists
+        expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
+        self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
+        self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root, "Build/%s_Uninstall.pkg" % self.env["package_name"])
+        
+        if os.path.isdir(expected_output_root):
+            self.output("Naively returning early because we seem to already have a built package.")
+            return
+            
+		# Take input params
+        xml_data = Template(TEMPLATE_XML).safe_substitute(
+            package_name=self.env["package_name"],
+            organization_name=self.env["organization_name"],
+            output_location=self.env["RECIPE_CACHE_DIR"],
+            sap_code=self.env["product_id"],
+            version=self.env["version"])
+        
+        # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
+        # that the input ends in '.xml'
+        (xml_fd, xml_path) = mkstemp(suffix=".xml",
+                                     prefix="ccp_autopkg_")
+        os.write(xml_fd, xml_data)
+
+        cmd = ['/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
+               '--appletID=CCP_UI',
+               '--appletVersion=1.0',
+               '--workflow=ccp',
+               '--automationMode=ccp_automation',
+               '--pkgConfigFile=%s' % xml_path]
+        self.output("Executing CCP build command: %s" % " ".join(cmd))
+        exitcode = subprocess.check_output(cmd)
+        
+        results_file = os.path.join(os.path.dirname(xml_path), os.path.splitext(xml_path)[0] + '_result.xml')
+        results_elem = ElementTree.parse(results_file).getroot()
+        if results_elem.find('error') is not None:
+            raise ProcessorError(
+                "CCP package build reported failure. Please inspect the PDApp "
+                "log file at: %s. 'results' XML file contents follow: \n%s" % (
+                    os.path.expanduser("~/Library/Logs/PDApp.log"),
+                    open(results_file, 'r').read()))
+        # success = results_elem.find('success')
+        # if success and success.text == '0':
+        #     self.output("Package build was a success: %s" % results)
+        
+        # TODO: pull out the CCP build version and save this as an output variable
+
+if __name__ == "__main__":
+    processor = CreativeCloudPackager()
+    processor.execute_shell()
