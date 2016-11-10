@@ -21,6 +21,7 @@ import subprocess
 from glob import glob
 from string import Template
 from tempfile import mkstemp
+import uuid
 from xml.etree import ElementTree
 
 from autopkglib import Processor, ProcessorError
@@ -34,21 +35,21 @@ __all__ = ["CreativeCloudPackager"]
 TEMPLATE_XML = """<CCPPackage>
   <CreatePackage>
     <packageName>${package_name}</packageName>
-    <packagingJobId>12345</packagingJobId>
+    <packagingJobId>${packaging_job_id}</packagingJobId>
     <outputLocation>${output_location}</outputLocation>
     <is64Bit>true</is64Bit>
-    <customerType>enterprise</customerType>
+    <customerType>${customer_type}</customerType>
     <organizationName>${organization_name}</organizationName>
     <!-- ProductCategory should be left 'Custom' -->
     <ProductCategory>Custom</ProductCategory>
     <matchOSLanguage>true</matchOSLanguage>
-	<IncludeUpdates>false</IncludeUpdates>
-	<rumEnabled>true</rumEnabled>
-	<updatesEnabled>false</updatesEnabled>
-	<appsPanelEnabled>false</appsPanelEnabled>
-	<adminPrivilegesEnabled>false</adminPrivilegesEnabled>
+	<IncludeUpdates>${include_updates}</IncludeUpdates>
+	<rumEnabled>${rum_enabled}</rumEnabled>
+	<updatesEnabled>${updates_enabled}</updatesEnabled>
+	<appsPanelEnabled>${apps_panel_enabled}</appsPanelEnabled>
+	<adminPrivilegesEnabled>${admin_privileges_enabled}</adminPrivilegesEnabled>
     <Language>
-      <id>en_US</id>
+      <id>${language}</id>
     </Language>
 	<Products>
 		<Product>
@@ -59,6 +60,7 @@ TEMPLATE_XML = """<CCPPackage>
   </CreatePackage>
 </CCPPackage>
 """
+
 
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
@@ -121,7 +123,6 @@ class CreativeCloudPackager(Processor):
             "description": "Path to the built bundle-style CCP uninstaller pkg.",
         },
     }
-    
 
     def main(self):
         # Handle any pre-existing package at the expected location, and end early if it matches our
@@ -129,35 +130,45 @@ class CreativeCloudPackager(Processor):
         # TODO: for now we just continue on if the dir already exists
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
         self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
-        self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root, "Build/%s_Uninstall.pkg" % self.env["package_name"])
-        
+        self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root,
+                                                        "Build/%s_Uninstall.pkg" % self.env["package_name"])
+
         if os.path.isdir(expected_output_root):
             self.output("Naively returning early because we seem to already have a built package.")
             return
-            
-		# Take input params
+
+        # Take input params
         xml_data = Template(TEMPLATE_XML).safe_substitute(
             package_name=self.env["package_name"],
+            packaging_job_id=uuid.uuid4(),
+            customer_type=self.env["customer_type"],
             organization_name=self.env["organization_name"],
+            include_updates=self.env["include_updates"],
+            rum_enabled=self.env["rum_enabled"],
+            language=self.env["language"],
+            updates_enabled=self.env["updates_enabled"],
+            apps_panel_enabled=self.env["apps_panel_enabled"],
+            admin_privileges_enabled=self.env["admin_privileges_enabled"],
             output_location=self.env["RECIPE_CACHE_DIR"],
             sap_code=self.env["product_id"],
             version=self.env["version"])
-        
+
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
         (xml_fd, xml_path) = mkstemp(suffix=".xml",
                                      prefix="ccp_autopkg_")
         os.write(xml_fd, xml_data)
 
-        cmd = ['/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
-               '--appletID=CCP_UI',
-               '--appletVersion=1.0',
-               '--workflow=ccp',
-               '--automationMode=ccp_automation',
-               '--pkgConfigFile=%s' % xml_path]
+        cmd = [
+            '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
+            '--appletID=CCP_UI',
+            '--appletVersion=1.0',
+            '--workflow=ccp',
+            '--automationMode=ccp_automation',
+            '--pkgConfigFile=%s' % xml_path]
         self.output("Executing CCP build command: %s" % " ".join(cmd))
         exitcode = subprocess.check_output(cmd)
-        
+
         results_file = os.path.join(os.path.dirname(xml_path), os.path.splitext(xml_path)[0] + '_result.xml')
         results_elem = ElementTree.parse(results_file).getroot()
         if results_elem.find('error') is not None:
@@ -166,11 +177,12 @@ class CreativeCloudPackager(Processor):
                 "log file at: %s. 'results' XML file contents follow: \n%s" % (
                     os.path.expanduser("~/Library/Logs/PDApp.log"),
                     open(results_file, 'r').read()))
-        # success = results_elem.find('success')
-        # if success and success.text == '0':
-        #     self.output("Package build was a success: %s" % results)
-        
-        # TODO: pull out the CCP build version and save this as an output variable
+            # success = results_elem.find('success')
+            # if success and success.text == '0':
+            #     self.output("Package build was a success: %s" % results)
+
+            # TODO: pull out the CCP build version and save this as an output variable
+
 
 if __name__ == "__main__":
     processor = CreativeCloudPackager()
