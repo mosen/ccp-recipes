@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import json
+import unicodedata
 import urllib2
 from urllib import urlencode
 
@@ -53,7 +54,7 @@ if __name__ == "__main__":
         print("Code: {}".format(sapcode))
 
         for product in productVersions:
-            name = product['displayName'].decode('utf-8')
+            name = unicodedata.normalize("NFKD", product['displayName'])
             print("\t{}\t\tBaseVersion:\t{}\tVersion:\t{}".format(
                 name,
                 product['platforms']['platform'][0]['languageSet'][0].get('baseVersion'),
