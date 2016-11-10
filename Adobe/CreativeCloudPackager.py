@@ -202,7 +202,7 @@ class CreativeCloudPackager(Processor):
                 )
             )
 
-        packageinfo = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"], "PackageInfo.txt")
+        packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
         if os.path.exists(packageinfo):
             self.env["notes"] = open(packageinfo, 'r').read()
 
