@@ -124,6 +124,18 @@ class CreativeCloudPackager(Processor):
         },
     }
 
+    def ccp_preferences(self):
+        """Get information about the currently signed-in CCP user, if available."""
+        prefs_path = os.path.expanduser("~/Library/Application Support/Adobe/CCP/CCPPreferences.xml")
+        prefs_elem = ElementTree.parse(prefs_path).getroot()
+
+        prefs = {}
+        if prefs_elem.find('userType') is not None:
+            prefs["customer_type"] = "team" if prefs_elem.find('userType') == "TEAM_CUSTOMER_TYPE" else "enterprise"
+
+        return prefs
+
+
     def main(self):
         # Handle any pre-existing package at the expected location, and end early if it matches our
         # input manifest
