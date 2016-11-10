@@ -80,7 +80,12 @@ class CreativeCloudPackager(Processor):
         },
         "organization_name": {
             "required": True,
-            "description": "The organization name which must match your licensed organization.",
+            "description": ("The organization name which must match your "
+                            "licensed organization. This can be obtained from "
+                            "either the Enterprise Dashboard (upper right), or "
+                            "by looking in Contents/Resources/optionXML.xml of "
+                            "a previously-built package, in the "
+                            "OrganizationName element."),
         },
         "serial_number": {
             "required": False,
