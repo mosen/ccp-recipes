@@ -127,6 +127,10 @@ class CreativeCloudPackager(Processor):
         },
         "package_info_text": {
             "description": "Text notes about which packages and updates are included in the pkg."
+        },
+        "ccp_version": {
+            "description": "Version of CCP tools used to build the package."
+        },
     }
 
     def ccp_preferences(self):
@@ -214,8 +218,17 @@ class CreativeCloudPackager(Processor):
         if os.path.exists(packageinfo):
             self.env["package_info_text"] = open(packageinfo, 'r').read()
 
-            # TODO: pull out the CCP build version and save this as an output variable
+        option_xml_root = ElementTree.parse(os.path.join(
+            self.env["pkg_path"], 'Contents/Resources/optionXML.xml')).getroot()
 
+        # Save the CCP build version
+        self.env["ccp_version"] = ""
+        ccp_version = option_xml_root.find("prodVersion")
+        if not ccp_version:
+            self.output(
+                "WARNING: Didn't find expected 'prodVersion' key (CCP "
+                "version) in optionXML.xml")
+        self.env["ccp_version"] = ccp_version.text
 
 if __name__ == "__main__":
     processor = CreativeCloudPackager()
