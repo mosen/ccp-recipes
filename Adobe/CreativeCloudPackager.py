@@ -268,7 +268,7 @@ class CreativeCloudPackager(Processor):
         # Save the CCP build version
         self.env["ccp_version"] = ""
         ccp_version = option_xml_root.find("prodVersion")
-        if not ccp_version:
+        if ccp_version is None:
             self.output(
                 "WARNING: Didn't find expected 'prodVersion' key (CCP "
                 "version) in optionXML.xml")
