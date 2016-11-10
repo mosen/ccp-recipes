@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import sys
-import string
 import json
 import urllib2
 from urllib import urlencode
@@ -51,14 +49,11 @@ if __name__ == "__main__":
         for product in channel['products']['product']:
             add_product(products, product)
 
-    # print("Name:\t{}Code:\t{}\tBaseVersion:\t{}".format(product['displayName'], product['id'], product['platforms']['platform'][0]['languageSet'][0].get('baseVersion')))
-
-
     for sapcode, productVersions in products.iteritems():
         print("Code: {}".format(sapcode))
 
         for product in productVersions:
-            name = product['displayName'].decode('utf8')
+            name = product['displayName'].decode('utf-8')
             print("\t{}\t\tBaseVersion:\t{}\tVersion:\t{}".format(
                 name,
                 product['platforms']['platform'][0]['languageSet'][0].get('baseVersion'),
