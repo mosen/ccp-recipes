@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import string
 import json
 import urllib2
@@ -106,12 +107,7 @@ class CreativeCloudFeed(Processor):
 
         return BASE_URL + '?' + urlencode(params)
 
-    def main(self):
-        product_id = self.env.get('product_id')
-        base_version = self.env.get('base_version')
-        channels = string.split(self.env.get('channels'), ',')
-        platforms = string.split(self.env.get('platforms'), ',')
-
+    def fetch(self, channels, platforms):
         url = self.feed_url(channels, platforms)
         self.output('Fetching from feed URL: {}'.format(url))
 
@@ -120,6 +116,17 @@ class CreativeCloudFeed(Processor):
             'x-adobe-app-id': 'AUSST_4_0',
         })
         data = json.loads(urllib2.urlopen(req).read())
+
+        return data
+
+    def main(self):
+        product_id = self.env.get('product_id')
+        base_version = self.env.get('base_version')
+        channels = string.split(self.env.get('channels'), ',')
+        platforms = string.split(self.env.get('platforms'), ',')
+
+        data = self.fetch(channels, platforms)
+
         channel_data = {}
         for channel in data['channel']:
             if channel['name'] in channels:
