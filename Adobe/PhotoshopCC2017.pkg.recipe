@@ -9,10 +9,12 @@
     <key>Input</key>
     <dict>
 		<key>NAME</key>
-		<string>AdobePhotoshopCC2015.5</string>
+		<string>AdobePhotoshopCC2017</string>
 		<!-- Org name is shown in the upper right hand corner of the Enterprise Dashboard web interface -->
 		<key>ORG_NAME</key>
 		<string>ADMIN_PLEASE_CHANGE</string>
+        <key>LICENSE_TYPE</key>
+        <string>team</string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.4.0</string>
@@ -40,6 +42,18 @@
 				<string>%ORG_NAME%</string>
 				<key>package_name</key>
 				<string>%NAME%</string>
+                <key>customer_type</key>
+                <string>%LICENSE_TYPE%</string>
+                <key>include_updates</key>
+                <true/>
+                <key>rum_enabled</key>
+                <true/>
+                <key>updates_enabled</key>
+                <false/>
+                <key>apps_panel_enabled</key>
+                <false/>
+                <key>admin_privileges_enabled</key>
+                <false/>
             </dict>
         </dict>
     </array>
