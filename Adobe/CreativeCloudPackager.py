@@ -209,9 +209,7 @@ class CreativeCloudPackager(Processor):
 
         packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
         if os.path.exists(packageinfo):
-            self.env["notes"] = open(packageinfo, 'r').read()
-
-
+            self.env["package_info_text"] = open(packageinfo, 'r').read()
 
             # TODO: pull out the CCP build version and save this as an output variable
 
