@@ -58,4 +58,9 @@ if __name__ == "__main__":
         print("Code: {}".format(sapcode))
 
         for product in productVersions:
-            print("\t{}BaseVersion:\t{}".format(product['displayName'], product['platforms']['platform'][0]['languageSet'][0].get('baseVersion')))
+            name = product['displayName'].decode('utf8')
+            print("\t{}\t\tBaseVersion:\t{}\tVersion:\t{}".format(
+                name,
+                product['platforms']['platform'][0]['languageSet'][0].get('baseVersion'),
+                product['version']
+            ))
