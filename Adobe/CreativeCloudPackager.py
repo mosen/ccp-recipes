@@ -15,12 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: disable=locally-disabled, import-error, invalid-name, no-member
+
+# for now
+# pylint: disable=line-too-long
+
 import os
 import subprocess
 
-from glob import glob
 from string import Template
-from tempfile import mkstemp
 import uuid
 from xml.etree import ElementTree
 
