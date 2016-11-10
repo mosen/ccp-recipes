@@ -200,11 +200,28 @@ class CreativeCloudPackager(Processor):
         results_file = os.path.join(os.path.dirname(xml_path), os.path.splitext(xml_path)[0] + '_result.xml')
         results_elem = ElementTree.parse(results_file).getroot()
         if results_elem.find('error') is not None:
-            raise ProcessorError(
-                "CCP package build reported failure. Please inspect the PDApp "
-                "log file at: %s. 'results' XML file contents follow: \n%s" % (
+            # Build an AutoPkg error message with help to diagnose
+            # possible build failures
+            autopkg_error_msg = "CCP package build reported failure.\n"
+            err_msg_type = results_elem.find('error/errorMessage')
+            if err_msg_type is not None:
+                autopkg_error_msg += "Error type: '%s'\n" % err_msg_type.text
+            if err_msg_type.text == "CustomerTypeMismatchError":
+                autopkg_error_msg += (
+                    "Please check that your organization is of the correct "
+                    "type, either 'enterprise' or 'team'.\n")
+            if err_msg_type.text == "TronWelcomeInputValidationError":
+                autopkg_error_msg += (
+                    "Please check that your organization ID (you provided "
+                    "'%s') matches one to which your CCP-signed-in user "
+                    "belongs.\n") % self.env["organization_name"]
+            autopkg_error_msg += (
+                "Please inspect the PDApp log file at: %s. 'results' XML file "
+                "contents follow: \n%s" % (
                     os.path.expanduser("~/Library/Logs/PDApp.log"),
                     open(results_file, 'r').read()))
+
+            raise ProcessorError(autopkg_error_msg)
 
         if results_elem.find('success') is None:
             raise ProcessorError(
