@@ -43,8 +43,7 @@ def fetch(channels, platforms):
     return data
 
 if __name__ == "__main__":
-    data = fetch(['ccm'], ['osx10', 'osx10-64'])
-
+    data = fetch(['ccm', 'sti'], ['osx10', 'osx10-64'])
     products = {}
     for channel in data['channel']:
         for product in channel['products']['product']:
