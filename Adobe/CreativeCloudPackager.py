@@ -122,6 +122,9 @@ class CreativeCloudPackager(Processor):
         "uninstaller_pkg_path": {
             "description": "Path to the built bundle-style CCP uninstaller pkg.",
         },
+        "notes": {
+            "description": "Text notes about which packages and updates are included in the pkg."
+        }
     }
 
     def ccp_preferences(self):
@@ -134,7 +137,6 @@ class CreativeCloudPackager(Processor):
             prefs["customer_type"] = "team" if prefs_elem.find('userType') == "TEAM_CUSTOMER_TYPE" else "enterprise"
 
         return prefs
-
 
     def main(self):
         # Handle any pre-existing package at the expected location, and end early if it matches our
@@ -199,6 +201,11 @@ class CreativeCloudPackager(Processor):
                     open(results_file, 'r').read()
                 )
             )
+
+        packageinfo = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"], "PackageInfo.txt")
+        if os.path.exists(packageinfo):
+            self.env["notes"] = open(packageinfo, 'r').read()
+
 
 
             # TODO: pull out the CCP build version and save this as an output variable
