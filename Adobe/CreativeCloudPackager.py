@@ -64,6 +64,9 @@ TEMPLATE_XML = """<CCPPackage>
 </CCPPackage>
 """
 
+CUSTOMER_TYPES = ["enterprise", "team"]
+CCP_PREFS_FILE = os.path.expanduser(
+    "~/Library/Application Support/Adobe/CCP/CCPPreferences.xml")
 
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
@@ -75,8 +78,10 @@ class CreativeCloudPackager(Processor):
         },
         "customer_type": {
             "required": False,
-            "default": "enterprise",
-            "description": "The license type 'enterprise' or 'team'",
+            "description": ("The license type, one of: %s. If this "
+                            "is omitted, CCP's preferences for the last "
+                            "logged-in user will be queried and that customer "
+                            "type used here.") % ", ".join(CUSTOMER_TYPES),
         },
         "organization_name": {
             "required": True,
@@ -140,13 +145,14 @@ class CreativeCloudPackager(Processor):
 
     def ccp_preferences(self):
         """Get information about the currently signed-in CCP user, if available."""
-        prefs_path = os.path.expanduser("~/Library/Application Support/Adobe/CCP/CCPPreferences.xml")
+        prefs_path = os.path.expanduser(CCP_PREFS_FILE)
         prefs_elem = ElementTree.parse(prefs_path).getroot()
 
         prefs = {}
-        if prefs_elem.find('userType') is not None:
-            prefs["customer_type"] = "team" if prefs_elem.find('userType') == "TEAM_CUSTOMER_TYPE" else "enterprise"
-
+        user_type_elem = prefs_elem.find('AAMEEPreferences/Preference/Screen/userType')
+        if user_type_elem is not None:
+            # convert 'FOO_CUSTOMER_TYPE' into 'foo'
+            prefs["customer_type"] = user_type_elem.text.lower().split('_')[0]
         return prefs
 
     def main(self):
@@ -162,13 +168,29 @@ class CreativeCloudPackager(Processor):
             self.output("Naively returning early because we seem to already have a built package.")
             return
 
-        jobid = uuid.uuid4()
+        # Set the customer type, using CCP's preferences if none provided
+        customer_type = self.env.get("customer_type")
+        if not customer_type:
+            ccp_prefs = self.ccp_preferences()
+            customer_type = ccp_prefs.get("customer_type")
+            if not customer_type:
+                raise ProcessorError(
+                    "No customer_type input provided and unable to read one "
+                    "from %s" % CCP_PREFS_FILE)
+            self.output("Using customer type '%s' found in CCPPreferences: %s'"
+                        % (customer_type, CCP_PREFS_FILE))
 
+        if customer_type not in CUSTOMER_TYPES:
+            raise ProcessorError(
+                "customer_type input variable must be one of : %s" %
+                ", ".join(CUSTOMER_TYPES))
+
+        jobid = uuid.uuid4()
         # Take input params
         xml_data = Template(TEMPLATE_XML).safe_substitute(
             package_name=self.env["package_name"],
             packaging_job_id=jobid,
-            customer_type=self.env["customer_type"],
+            customer_type=customer_type,
             organization_name=self.env["organization_name"],
             include_updates=self.env["include_updates"],
             rum_enabled=self.env["rum_enabled"],

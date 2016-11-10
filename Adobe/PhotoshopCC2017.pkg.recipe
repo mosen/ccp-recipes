@@ -13,8 +13,9 @@
   		  <!-- Org name is shown in the upper right hand corner of the Enterprise Dashboard web interface -->
   		  <key>ORG_NAME</key>
   		  <string>ADMIN_PLEASE_CHANGE</string>
+        <!-- 'enterprise' or 'team', or left blank we will read from CCP's prefs -->
         <key>LICENSE_TYPE</key>
-        <string>team</string>
+        <string></string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.4.0</string>
