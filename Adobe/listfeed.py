@@ -51,12 +51,17 @@ if __name__ == "__main__":
             add_product(products, product)
 
     for sapcode, productVersions in products.iteritems():
-        print("Code: {}".format(sapcode))
+        print("SAP Code: {}".format(sapcode))
 
         for product in productVersions:
+            base_version = product['platforms']['platform'][0]['languageSet'][0].get('baseVersion')
+            if not base_version:
+                base_version = "N/A"
+
             name = unicodedata.normalize("NFKD", product['displayName'])
-            print("\t{}\t\tBaseVersion:\t{}\tVersion:\t{}".format(
+            print("\t{0: <60}\tBaseVersion: {1: <14}\tVersion: {2: <14}".format(
                 name,
-                product['platforms']['platform'][0]['languageSet'][0].get('baseVersion'),
+                base_version,
                 product['version']
             ))
+        print("")
