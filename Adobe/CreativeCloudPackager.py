@@ -192,9 +192,14 @@ class CreativeCloudPackager(Processor):
                 "log file at: %s. 'results' XML file contents follow: \n%s" % (
                     os.path.expanduser("~/Library/Logs/PDApp.log"),
                     open(results_file, 'r').read()))
-            # success = results_elem.find('success')
-            # if success and success.text == '0':
-            #     self.output("Package build was a success: %s" % results)
+
+        if results_elem.find('success') is None:
+            raise ProcessorError(
+                "Unexpected result from CCP, 'results' XML file contents follow: \n{}".format(
+                    open(results_file, 'r').read()
+                )
+            )
+
 
             # TODO: pull out the CCP build version and save this as an output variable
 
