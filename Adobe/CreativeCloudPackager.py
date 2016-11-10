@@ -122,9 +122,8 @@ class CreativeCloudPackager(Processor):
         "uninstaller_pkg_path": {
             "description": "Path to the built bundle-style CCP uninstaller pkg.",
         },
-        "notes": {
+        "package_info_text": {
             "description": "Text notes about which packages and updates are included in the pkg."
-        }
     }
 
     def ccp_preferences(self):
@@ -207,6 +206,7 @@ class CreativeCloudPackager(Processor):
                 )
             )
 
+        # Save PackageInfo.txt
         packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
         if os.path.exists(packageinfo):
             self.env["package_info_text"] = open(packageinfo, 'r').read()
