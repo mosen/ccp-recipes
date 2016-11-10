@@ -137,10 +137,12 @@ class CreativeCloudPackager(Processor):
             self.output("Naively returning early because we seem to already have a built package.")
             return
 
+        jobid = uuid.uuid4()
+
         # Take input params
         xml_data = Template(TEMPLATE_XML).safe_substitute(
             package_name=self.env["package_name"],
-            packaging_job_id=uuid.uuid4(),
+            packaging_job_id=jobid,
             customer_type=self.env["customer_type"],
             organization_name=self.env["organization_name"],
             include_updates=self.env["include_updates"],
@@ -155,9 +157,9 @@ class CreativeCloudPackager(Processor):
 
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
-        (xml_fd, xml_path) = mkstemp(suffix=".xml",
-                                     prefix="ccp_autopkg_")
-        os.write(xml_fd, xml_data)
+        xml_path = "{}/ccp_autopkg_{}.xml".format(self.env["RECIPE_CACHE_DIR"], jobid)
+        with open(xml_path, 'w+') as xml_fd:
+            xml_fd.write(xml_data)
 
         cmd = [
             '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
@@ -168,6 +170,7 @@ class CreativeCloudPackager(Processor):
             '--pkgConfigFile=%s' % xml_path]
         self.output("Executing CCP build command: %s" % " ".join(cmd))
         exitcode = subprocess.check_output(cmd)
+        self.output("CCP Exited with status {}".format(exitcode))
 
         results_file = os.path.join(os.path.dirname(xml_path), os.path.splitext(xml_path)[0] + '_result.xml')
         results_elem = ElementTree.parse(results_file).getroot()
