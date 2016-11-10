@@ -183,7 +183,12 @@ class CreativeCloudPackager(Processor):
             '--automationMode=ccp_automation',
             '--pkgConfigFile=%s' % xml_path]
         self.output("Executing CCP build command: %s" % " ".join(cmd))
-        exitcode = subprocess.check_output(cmd)
+        proc = subprocess.Popen(cmd,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, _ = proc.communicate()
+        if out:
+            self.output("CCP Output: %s" % out)
+        exitcode = proc.returncode
         self.output("CCP Exited with status {}".format(exitcode))
 
         results_file = os.path.join(os.path.dirname(xml_path), os.path.splitext(xml_path)[0] + '_result.xml')
