@@ -128,9 +128,11 @@ class CreativeCloudFeed(Processor):
         data = self.fetch(channels, platforms)
 
         channel_data = {}
+        channel_cdn = {}
         for channel in data['channel']:
             if channel['name'] in channels:
                 channel_data[channel['name']] = channel
+                channel_cdn[channel['name']] = channel.get('cdn')
 
         product = {'version': '1.0'}
         for channel in data['channel']:
@@ -173,6 +175,12 @@ class CreativeCloudFeed(Processor):
         self.output('Found matching product {}, version: {}'.format(product.get('displayName'), product.get('version')))
 
         compatibility_range = first_platform['systemCompatibility']['operatingSystem']['range'][0]
+
+        if 'urls' in first_platform:
+            self.env['manifest_url'] = '{}{}'.format(
+                channel_cdn['ccm']['secure'],
+                first_platform.get('manifestURL')
+            )
 
         # output variable naming has been kept as close to pkginfo names as possible in order to feed munkiimport
         
