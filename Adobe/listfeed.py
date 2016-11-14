@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+import sys
 import json
 import unicodedata
 import urllib2
@@ -42,25 +44,43 @@ def fetch(channels, platforms):
 
     return data
 
+def dump(channels, platforms):
+    """Save feed contents to feed.json file"""
+    url = feed_url(channels, platforms)
+    print('Fetching from feed URL: {}'.format(url))
+
+    req = urllib2.Request(url, headers={
+        'User-Agent': 'Creative Cloud',
+        'x-adobe-app-id': 'AUSST_4_0',
+    })
+    data = urllib2.urlopen(req).read()
+    with open(os.path.join(os.path.dirname(__file__), 'feed.json'), 'w+') as feed_fd:
+        feed_fd.write(data)
+    print('Wrote output to feed.json')
+
+
 if __name__ == "__main__":
-    data = fetch(['ccm', 'sti'], ['osx10', 'osx10-64'])
-    products = {}
-    for channel in data['channel']:
-        for product in channel['products']['product']:
-            add_product(products, product)
+    if len(sys.argv) > 1 and sys.argv[1] == 'dump':
+        dump(['ccm', 'sti'], ['osx10', 'osx10-64'])
+    else:
+        data = fetch(['ccm', 'sti'], ['osx10', 'osx10-64'])
+        products = {}
+        for channel in data['channel']:
+            for product in channel['products']['product']:
+                add_product(products, product)
 
-    for sapcode, productVersions in products.iteritems():
-        print("SAP Code: {}".format(sapcode))
+        for sapcode, productVersions in products.iteritems():
+            print("SAP Code: {}".format(sapcode))
 
-        for product in productVersions:
-            base_version = product['platforms']['platform'][0]['languageSet'][0].get('baseVersion')
-            if not base_version:
-                base_version = "N/A"
+            for product in productVersions:
+                base_version = product['platforms']['platform'][0]['languageSet'][0].get('baseVersion')
+                if not base_version:
+                    base_version = "N/A"
 
-            name = unicodedata.normalize("NFKD", product['displayName'])
-            print("\t{0: <60}\tBaseVersion: {1: <14}\tVersion: {2: <14}".format(
-                name,
-                base_version,
-                product['version']
-            ))
-        print("")
+                name = unicodedata.normalize("NFKD", product['displayName'])
+                print("\t{0: <60}\tBaseVersion: {1: <14}\tVersion: {2: <14}".format(
+                    name,
+                    base_version,
+                    product['version']
+                ))
+            print("")

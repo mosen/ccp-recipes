@@ -42,8 +42,8 @@ class CreativeCloudFeed(Processor):
             "description": "The product sap code",
         },
         "base_version": {
-            "required": True,
-            "description": "The base product version",
+            "required": False,
+            "description": "The base product version. Note that some packages do not have a base version.",
         },
         "version": {
             "required": False,
@@ -141,7 +141,7 @@ class CreativeCloudFeed(Processor):
                 if prod['id'] != product_id:
                     continue
 
-                if prod['platforms']['platform'][0]['languageSet'][0].get('baseVersion') != base_version:
+                if base_version is not None and prod['platforms']['platform'][0]['languageSet'][0].get('baseVersion') != base_version:
                     continue
 
                 if 'version' not in prod:
@@ -157,7 +157,10 @@ class CreativeCloudFeed(Processor):
                 else:
                     if prod['version'] == self.env["version"]:
                         product = prod
-        
+
+        if 'platforms' not in product:
+            raise ProcessorError('No package matched the SAP Code, Base version, and version combination you specified.')
+
         first_platform = {}
         for platform in product['platforms']['platform']:
             if platform['id'] in platforms:
