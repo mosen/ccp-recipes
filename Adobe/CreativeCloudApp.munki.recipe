@@ -49,8 +49,12 @@
                 <dict>
                     <key>additional_pkginfo</key>
                     <dict>
+                        <key>version</key>
+                        <string>%version%</string>
                         <key>minimum_os_version</key>
                         <string>%minimum_os_version%</string>
+                        <key>display_name</key>
+                        <string>%display_name%</string>
                     </dict>
                 </dict>
                 <key>Processor</key>
