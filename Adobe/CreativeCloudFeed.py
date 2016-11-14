@@ -141,7 +141,7 @@ class CreativeCloudFeed(Processor):
                 if prod['id'] != product_id:
                     continue
 
-                if base_version is not None and prod['platforms']['platform'][0]['languageSet'][0].get('baseVersion') != base_version:
+                if base_version and prod['platforms']['platform'][0]['languageSet'][0].get('baseVersion') != base_version:
                     continue
 
                 if 'version' not in prod:
@@ -181,6 +181,14 @@ class CreativeCloudFeed(Processor):
         self.env['product_info_url'] = product.get('productInfoPage')
         self.env['version'] = product.get('version')
         self.env['display_name'] = product.get('displayName')
+
+        if 'productIcons' in product:
+            for icon in product['productIcons'].get('icon', []):
+                if icon.get('size') == '96x96':
+                    self.env['icon_url'] = icon.get('value')
+                    break
+
+
 
 if __name__ == "__main__":
     processor = CreativeCloudFeed()
