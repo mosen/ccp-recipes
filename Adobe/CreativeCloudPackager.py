@@ -73,7 +73,7 @@ class CreativeCloudPackager(Processor):
     description = "Runs the CCP packager."
     input_variables = {
         "package_name": {
-            "required": False,
+            "required": True,
             "description": "The output package name",
         },
         "customer_type": {

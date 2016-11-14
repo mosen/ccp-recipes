@@ -108,8 +108,72 @@ Takes information about package(s) and your license information, and builds
 a package using Creative Cloud Packager.
 
 #### Input Variables
+- **package_name:**
+    - **default:**
+    - **required:** True
+    - **description:** The name of the output package. CCP will add `_Install` and `_Uninstall` suffixes.
+    
+- **customer_type:**
+    - **default:** (Taken from your CCP Preferences for the most recent login)
+    - **required:** False
+    - **description:** The license type, one of: "enterprise", "team". If this is omitted, CCP's preferences for
+    the last logged-in user will be queried and that customer type used here.
+    
+- **organization_name:**
+    - **default:** (None)
+    - **required:** True
+    - **description:** The organization name which must match your licensed organization.
+    This can be obtained from either the Enterprise Dashboard (upper right), Team management dashboard (upper left), or
+    by looking in `Contents/Resources/optionXML.xml` of a previously-built package, in the `OrganizationName` element.
+    
+- **serial_number:**
+    - **default:** (None)
+    - **required:** False
+    - **description:** The serial number, if you are using serialized packages.
 
+- **language:**
+    - **default:** "en_US"
+    - **required:** False
+    - **description:** The language to build.
+    
+- **include_updates:**
+    - **default:** True
+    - **required:** False
+    - **description:** Include all available updates to the package(s) specified.
+
+- **rum_enabled:**
+    - **default:** True
+    - **required:** False
+    - **description:** Include RUM in the package.
+    
+- **updates_enabled:**
+    - **default:** False
+    - **required:** False
+    - **description:** Allow the end user to perform updates.
+    
+- **apps_panel_enabled:**
+    - **default:** True
+    - **required:** False
+    - **description:** Allow the end user to see the Apps panel for app installation and removal.
+   
+- **admin_privileges_enabled:**
+    - **default:** False
+    - **required:** False
+    - **description:** Allow the **Creative Cloud** desktop application to run in privileged mode.
+    This allows users to perform installations without being a local administrator.
+    
 #### Output Variables
+- **pkg_path:**
+    - **description:** Path to the built bundle-style CCP installer pkg.
 
+- **uninstaller_pkg_path:**
+    - **description:** Path to the built bundle-style CCP uninstaller pkg.
+
+- **package_info_text:**
+    - **description:** Text notes about which packages and updates are included in the pkg.
+    
+- **ccp_version:**
+    - **description:** Version of CCP tools used to build the package.
+    
 
 
