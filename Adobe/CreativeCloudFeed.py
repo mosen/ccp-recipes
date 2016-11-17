@@ -21,6 +21,7 @@ import json
 import urllib2
 from urllib import urlencode
 from distutils.version import LooseVersion as LV
+from xml.etree import ElementTree
 
 # for debugging
 from pprint import pprint
@@ -30,8 +31,8 @@ from autopkglib import Processor, ProcessorError
 __all__ = ["CreativeCloudFeed"]
 
 BASE_URL = 'https://prod-rel-ffc-ccm.oobesaas.adobe.com/adobe-ffc-external/core/v4/products/all'
-
-# Sap Codes can be seen at https://helpx.adobe.com/creative-cloud/packager/apps-deployed-without-their-base-versions.html
+CDN_SECURE_URL = 'https://ccmdls.adobe.com'
+HEADERS = {'User-Agent': 'Creative Cloud', 'x-adobe-app-id': 'AUSST_4_0'}
 
 class CreativeCloudFeed(Processor):
     """Fetch information about product(s) from the Creative Cloud products feed."""
@@ -61,8 +62,13 @@ class CreativeCloudFeed(Processor):
         "platforms": {
             "required": False,
             "default": "osx10,osx10-64",
-            "desription": "The deployment platform(s), comma separated. (default is osx10,osx10-64)",
+            "description": "The deployment platform(s), comma separated. (default is osx10,osx10-64)",
         },
+        "parse_proxy_xml": {
+            "required": False,
+            "default": False,
+            "description": "Fetch and parse the product proxy XML"
+        }
     }
 
     output_variables = {
@@ -107,14 +113,21 @@ class CreativeCloudFeed(Processor):
 
         return BASE_URL + '?' + urlencode(params)
 
+    def fetch_manifest(self, manifest_url):
+        """Fetch the proxy.xml file given in the manifest"""
+        self.output('Fetching manifest.xml from {}'.format(manifest_url))
+        req = urllib2.Request(manifest_url, headers=HEADERS)
+        content = urllib2.urlopen(req).read()
+        root = ElementTree.parse(content).getroot()
+
+
+
+
     def fetch(self, channels, platforms):
         url = self.feed_url(channels, platforms)
         self.output('Fetching from feed URL: {}'.format(url))
 
-        req = urllib2.Request(url, headers={
-            'User-Agent': 'Creative Cloud',
-            'x-adobe-app-id': 'AUSST_4_0',
-        })
+        req = urllib2.Request(url, headers=HEADERS)
         data = json.loads(urllib2.urlopen(req).read())
 
         return data
@@ -176,11 +189,17 @@ class CreativeCloudFeed(Processor):
 
         compatibility_range = first_platform['systemCompatibility']['operatingSystem']['range'][0]
 
-        if 'urls' in first_platform:
+        if 'urls' in first_platform['languageSet'][0]:
             self.env['manifest_url'] = '{}{}'.format(
                 channel_cdn['ccm']['secure'],
-                first_platform.get('manifestURL')
+                first_platform['languageSet'][0]['urls'].get('manifestURL')
             )
+
+            if True:  # self.env.get('parse_proxy_xml', False):
+                self.output('Processor will fetch proxy xml')
+                self.fetch_manifest(self.env['manifest_url'])
+        else:
+            self.output('Did not find a manifest.xml in the product json data')
 
         # output variable naming has been kept as close to pkginfo names as possible in order to feed munkiimport
         
