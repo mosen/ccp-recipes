@@ -62,9 +62,9 @@ def dump(channels, platforms):
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == 'dump':
-        dump(['ccm', 'sti'], ['osx10', 'osx10-64'])
+        dump(['ccp_hd_2', 'sti'], ['osx10', 'osx10-64'])
     else:
-        data = fetch(['ccm', 'sti'], ['osx10', 'osx10-64'])
+        data = fetch(['ccp_hd_2', 'sti'], ['osx10', 'osx10-64'])
         products = {}
         for channel in data['channel']:
             for product in channel['products']['product']:

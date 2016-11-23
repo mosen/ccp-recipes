@@ -30,8 +30,11 @@ from autopkglib import Processor, ProcessorError
 
 __all__ = ["CreativeCloudFeed"]
 
+AAMEE_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/aamee/v2/products/all'
 BASE_URL = 'https://prod-rel-ffc-ccm.oobesaas.adobe.com/adobe-ffc-external/core/v4/products/all'
 CDN_SECURE_URL = 'https://ccmdls.adobe.com'
+UPDATE_DESC_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/core/v1/update/description?name={sapcode}&version={version}&platform={platform}&language={language}'
+UPDATE_FEED_URL_MAC = 'https://swupmf.adobe.com/webfeed/oobe/aam20/mac/updaterfeed.xml'
 HEADERS = {'User-Agent': 'Creative Cloud', 'x-adobe-app-id': 'AUSST_4_0'}
 
 class CreativeCloudFeed(Processor):
@@ -146,6 +149,7 @@ class CreativeCloudFeed(Processor):
         self.fetch_proxy_data(proxy_data_url_el.text)
 
     def fetch(self, channels, platforms):
+        """Download the main feed"""
         url = self.feed_url(channels, platforms)
         self.output('Fetching from feed URL: {}'.format(url))
 
