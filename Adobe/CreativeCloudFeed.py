@@ -127,10 +127,15 @@ class CreativeCloudFeed(Processor):
         self.env['version'] = product_version_el.text
 
     def fetch_manifest(self, manifest_url):
-        """Fetch the manifest.xml at manifest_url which contains asset download and proxy data information"""
+        """Fetch the manifest.xml at manifest_url which contains asset download and proxy data information.
+        Not all products have a proxy_data element"""
         self.output('Fetching manifest.xml from {}'.format(manifest_url))
         req = urllib2.Request(manifest_url, headers=HEADERS)
         content = urllib2.urlopen(req).read()
+
+        # Write out the manifest for debugging purposes
+        with open('{}/manifest.xml'.format(self.env['RECIPE_CACHE_DIR']), 'w+') as fd:
+            fd.write(content)
 
         manifest = ElementTree.fromstring(content)
 
@@ -139,7 +144,6 @@ class CreativeCloudFeed(Processor):
             raise ProcessorError('Could not find proxy data URL in manifest, aborting since your package requires it.')
 
         self.fetch_proxy_data(proxy_data_url_el.text)
-
 
     def fetch(self, channels, platforms):
         url = self.feed_url(channels, platforms)
@@ -205,7 +209,13 @@ class CreativeCloudFeed(Processor):
 
         self.output('Found matching product {}, version: {}'.format(product.get('displayName'), product.get('version')))
 
-        compatibility_range = first_platform['systemCompatibility']['operatingSystem']['range'][0]
+        if len(first_platform['systemCompatibility']['operatingSystem']['range']) > 0:
+            compatibility_range = first_platform['systemCompatibility']['operatingSystem']['range'][0]
+            # systemCompatibility currently has values like:
+            # 10.x.0-
+            # 10.10- (no minor version specified)
+            # (empty array)
+            self.env['minimum_os_version'] = compatibility_range.split('-')[0]
 
         if 'urls' in first_platform['languageSet'][0]:
             self.env['manifest_url'] = '{}{}'.format(
@@ -220,9 +230,6 @@ class CreativeCloudFeed(Processor):
             self.output('Did not find a manifest.xml in the product json data')
 
         # output variable naming has been kept as close to pkginfo names as possible in order to feed munkiimport
-        
-        # TODO: sanity-check this "systemCompatibility range" value
-        self.env['minimum_os_version'] = compatibility_range.split('-')[0]
         self.env['product_info_url'] = product.get('productInfoPage')
         self.env['version'] = product.get('version')
         self.env['display_name'] = product.get('displayName')
@@ -232,7 +239,6 @@ class CreativeCloudFeed(Processor):
                 if icon.get('size') == '96x96':
                     self.env['icon_url'] = icon.get('value')
                     break
-
 
 
 if __name__ == "__main__":

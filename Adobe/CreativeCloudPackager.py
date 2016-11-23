@@ -135,6 +135,9 @@ class CreativeCloudPackager(Processor):
         "uninstaller_pkg_path": {
             "description": "Path to the built bundle-style CCP uninstaller pkg.",
         },
+        "ccp_path": {
+            "description": "Path to the .ccp file output from the build process."
+        },
         "package_info_text": {
             "description": "Text notes about which packages and updates are included in the pkg."
         },
@@ -261,6 +264,10 @@ class CreativeCloudPackager(Processor):
         packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
         if os.path.exists(packageinfo):
             self.env["package_info_text"] = open(packageinfo, 'r').read()
+
+        ccp_path = os.path.join(expected_output_root, 'Build/{}.ccp'.format(self.env["package_name"]))
+        if os.path.exists(ccp_path):
+            self.env["ccp_path"] = ccp_path
 
         option_xml_root = ElementTree.parse(os.path.join(
             self.env["pkg_path"], 'Contents/Resources/optionXML.xml')).getroot()
