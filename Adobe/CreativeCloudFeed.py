@@ -118,21 +118,27 @@ class CreativeCloudFeed(Processor):
         self.output('Fetching proxy data from {}'.format(proxy_data_url))
         req = urllib2.Request(proxy_data_url, headers=HEADERS)
         content = urllib2.urlopen(req).read()
-        print(content)
-        # data = ElementTree.fromstring(content)
 
+        proxy_data = ElementTree.fromstring(content)
+        product_version_el = proxy_data.find('InstallerProperties/Property[@name="ProductVersion"]')
+        if product_version_el is None:
+            raise ProcessorError('Could not find ProductVersion in proxy data, aborting.')
 
+        self.env['version'] = product_version_el.text
 
     def fetch_manifest(self, manifest_url):
         """Fetch the manifest.xml at manifest_url which contains asset download and proxy data information"""
         self.output('Fetching manifest.xml from {}'.format(manifest_url))
         req = urllib2.Request(manifest_url, headers=HEADERS)
         content = urllib2.urlopen(req).read()
-        manifest = ElementTree.fromstring(content)
-        root = manifest.getroot()
 
-        proxy_data_url = root.find('proxy_data').text
-        self.fetch_proxy_data(proxy_data_url)
+        manifest = ElementTree.fromstring(content)
+
+        proxy_data_url_el = manifest.find('asset_list/asset/proxy_data')
+        if proxy_data_url_el is None:
+            raise ProcessorError('Could not find proxy data URL in manifest, aborting since your package requires it.')
+
+        self.fetch_proxy_data(proxy_data_url_el.text)
 
 
     def fetch(self, channels, platforms):
