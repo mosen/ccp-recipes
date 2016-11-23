@@ -195,7 +195,7 @@ class CreativeCloudFeed(Processor):
                 first_platform['languageSet'][0]['urls'].get('manifestURL')
             )
 
-            if True:  # self.env.get('parse_proxy_xml', False):
+            if self.env.get('parse_proxy_xml', False):
                 self.output('Processor will fetch proxy xml')
                 self.fetch_manifest(self.env['manifest_url'])
         else:
