@@ -113,14 +113,26 @@ class CreativeCloudFeed(Processor):
 
         return BASE_URL + '?' + urlencode(params)
 
+    def fetch_proxy_data(self, proxy_data_url):
+        """Fetch the proxy data to get additional information about the product."""
+        self.output('Fetching proxy data from {}'.format(proxy_data_url))
+        req = urllib2.Request(proxy_data_url, headers=HEADERS)
+        content = urllib2.urlopen(req).read()
+        print(content)
+        # data = ElementTree.fromstring(content)
+
+
+
     def fetch_manifest(self, manifest_url):
-        """Fetch the proxy.xml file given in the manifest"""
+        """Fetch the manifest.xml at manifest_url which contains asset download and proxy data information"""
         self.output('Fetching manifest.xml from {}'.format(manifest_url))
         req = urllib2.Request(manifest_url, headers=HEADERS)
         content = urllib2.urlopen(req).read()
-        root = ElementTree.parse(content).getroot()
+        manifest = ElementTree.fromstring(content)
+        root = manifest.getroot()
 
-
+        proxy_data_url = root.find('proxy_data').text
+        self.fetch_proxy_data(proxy_data_url)
 
 
     def fetch(self, channels, platforms):
@@ -196,7 +208,7 @@ class CreativeCloudFeed(Processor):
             )
 
             if self.env.get('parse_proxy_xml', False):
-                self.output('Processor will fetch proxy xml')
+                self.output('Processor will fetch manifest and proxy xml')
                 self.fetch_manifest(self.env['manifest_url'])
         else:
             self.output('Did not find a manifest.xml in the product json data')
