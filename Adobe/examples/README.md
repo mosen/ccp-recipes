@@ -9,3 +9,9 @@ supplying the required `ORG_NAME` variable on the command line eg:
     $ autopkg run -k ORG_NAME="my org" ./AcrobatDC.pkg
 
 *WARNING:* There is no guarantee that this list of recipes is complete.
+
+## Currently Failing ##
+
+- Edge Code
+- Experience Design
+- Lightroom minor version will be incorrect due to patches not detected.
