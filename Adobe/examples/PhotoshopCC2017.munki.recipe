@@ -5,18 +5,18 @@
     <key>Description</key>
     <string>Run Adobe CCP to package the latest version of Adobe Photoshop CC 2017, and import into Munki</string>
     <key>Identifier</key>
-    <string>com.github.mosen.munki.Adobe.PhotoshopCC2017</string>
+    <string>local.munki.PhotoshopCC2017</string>
     <key>Input</key>
     <dict>
 		<key>NAME</key>
-		<string>AdobePhotoshopCC2017</string>
+		<string>PhotoshopCC2017</string>
 		<key>MUNKI_REPO_SUBDIR</key>
-		<string>test/AdobeCCPAutomation</string>
+		<string>apps/Adobe</string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.4.0</string>
 	<key>ParentRecipe</key>
-	<string>com.github.mosen.pkg.Adobe.PhotoshopCC2017</string>
+	<string>local.pkg.PhotoshopCC2017</string>
     <key>Process</key>
     <array>
 		<!-- Build the installer DMG for Munki containing the entire Build directory,
