@@ -3,20 +3,20 @@
 <plist version="1.0">
 <dict>
     <key>Description</key>
-    <string>Run Adobe CCP to package the latest version of Adobe Photoshop CC 2017, and import into Munki</string>
+    <string>Run Adobe CCP to package the latest version of Adobe Photoshop CC, and import into Munki</string>
     <key>Identifier</key>
-    <string>local.munki.PhotoshopCC2017</string>
+    <string>local.munki.Adobe.PhotoshopCC</string>
     <key>Input</key>
     <dict>
 		<key>NAME</key>
-		<string>PhotoshopCC2017</string>
+		<string>AdobePhotoshopCC</string>
 		<key>MUNKI_REPO_SUBDIR</key>
 		<string>apps/Adobe</string>
     </dict>
     <key>MinimumVersion</key>
     <string>0.4.0</string>
 	<key>ParentRecipe</key>
-	<string>local.pkg.PhotoshopCC2017</string>
+	<string>local.pkg.Adobe.PhotoshopCC</string>
     <key>Process</key>
     <array>
 		<!-- Build the installer DMG for Munki containing the entire Build directory,

@@ -3,25 +3,27 @@
 <plist version="1.0">
 <dict>
 	<key>Identifier</key>
-	<string>local.pkg.InDesignCC2017</string>
+	<string>local.munki.Adobe.ExtendscriptToolkit</string>
 	<key>Input</key>
 	<dict>
+		<key>NAME</key>
+		<string>AdobeExtendscriptToolkit</string>
+		<key>MUNKI_REPO_SUBDIR</key>
+		<string>apps/Adobe</string>
 		<key>ADMIN_PRIVILEGES_ENABLED</key>
 		<false/>
 		<key>APPS_PANEL_ENABLED</key>
 		<false/>
 		<key>BASE_VERSION</key>
-		<string>12.0.0</string>
+		<string></string>
 		<key>INCLUDE_UPDATES</key>
 		<true/>
 		<key>LICENSE_TYPE</key>
 		<string>team</string>
-		<key>NAME</key>
-		<string>InDesignCC2017</string>
 		<key>ORG_NAME</key>
 		<string>ADMIN_PLEASE_CHANGE</string>
 		<key>PRODUCT_ID</key>
-		<string>IDSN</string>
+		<string>KETK</string>
 		<key>RUM_ENABLED</key>
 		<true/>
 		<key>UPDATES_ENABLED</key>
@@ -30,6 +32,6 @@
 		<string>latest</string>
 	</dict>
 	<key>ParentRecipe</key>
-	<string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
+	<string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
 </dict>
 </plist>

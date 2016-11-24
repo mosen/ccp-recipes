@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Identifier</key>
-	<string>local.pkg.AcrobatDC</string>
+	<string>local.pkg.Adobe.AcrobatDC</string>
 	<key>Input</key>
 	<dict>
 		<key>ADMIN_PRIVILEGES_ENABLED</key>

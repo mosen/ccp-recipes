@@ -3,15 +3,11 @@
 <plist version="1.0">
     <dict>
         <key>Description</key>
-        <string>Example Creative Cloud Application import into Munki</string>
+        <string>Build and import a Creative Cloud Application into munki</string>
         <key>Identifier</key>
         <string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
         <key>Input</key>
         <dict>
-            <key>NAME</key>
-            <string>AdobePhotoshopCC2017</string>
-            <key>MUNKI_REPO_SUBDIR</key>
-            <string>test/AdobeCCPAutomation</string>
         </dict>
         <key>MinimumVersion</key>
         <string>0.4.0</string>
@@ -63,14 +59,10 @@
             <dict>
                 <key>Arguments</key>
                 <dict>
-                    <!-- TODO: MunkiImporter doesn't currently handle copying uninstaller pkgs -->
-                    <key>additional_makepkginfo_options</key>
-                    <array>
-                        <string>--uninstallpkg</string>
-                        <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.dmg</string>
-                    </array>
                     <key>pkg_path</key>
                     <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.dmg</string>
+                    <key>uninstaller_pkg_path</key>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.dmg</string>
                     <key>repo_subdirectory</key>
                     <string>%MUNKI_REPO_SUBDIR%</string>
                 </dict>

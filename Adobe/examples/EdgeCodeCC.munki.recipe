@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>Identifier</key>
-	<string>local.munki.Adobe.AcrobatDC</string>
+	<string>local.munki.Adobe.EdgeCodeCC</string>
 	<key>Input</key>
 	<dict>
 		<key>NAME</key>
-		<string>AdobeAcrobatDC</string>
+		<string>AdobeEdgeCodeCC</string>
 		<key>MUNKI_REPO_SUBDIR</key>
 		<string>apps/Adobe</string>
 		<key>ADMIN_PRIVILEGES_ENABLED</key>
@@ -23,15 +23,13 @@
 		<key>ORG_NAME</key>
 		<string>ADMIN_PLEASE_CHANGE</string>
 		<key>PRODUCT_ID</key>
-		<string>APRO</string>
+		<string>CODE</string>
 		<key>RUM_ENABLED</key>
 		<true/>
 		<key>UPDATES_ENABLED</key>
 		<false/>
 		<key>VERSION</key>
-		<string>15.0</string>
-		<key>parse_proxy_xml</key>
-		<true/>
+		<string>1.0</string>
 	</dict>
 	<key>MinimumVersion</key>
 	<string>0.4.0</string>

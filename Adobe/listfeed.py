@@ -30,7 +30,7 @@ def feed_url(channels, platforms):
     for pl in platforms:
         params.append(('platform', pl))
 
-    return BASE_URL + '?' + urlencode(params)
+    return CCM_URL + '?' + urlencode(params)
 
 def fetch(channels, platforms):
     """Fetch the feed contents."""

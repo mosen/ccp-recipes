@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Identifier</key>
-	<string>local.pkg.PhotoshopCC2017</string>
+	<string>local.pkg.Adobe.MediaEncoderCC</string>
 	<key>Input</key>
 	<dict>
 		<key>ADMIN_PRIVILEGES_ENABLED</key>
@@ -11,17 +11,17 @@
 		<key>APPS_PANEL_ENABLED</key>
 		<false/>
 		<key>BASE_VERSION</key>
-		<string>18.0</string>
+		<string></string>
 		<key>INCLUDE_UPDATES</key>
 		<true/>
 		<key>LICENSE_TYPE</key>
 		<string>team</string>
 		<key>NAME</key>
-		<string>AdobePhotoshopCC2017</string>
+		<string>AdobeMediaEncoderCC</string>
 		<key>ORG_NAME</key>
 		<string>ADMIN_PLEASE_CHANGE</string>
 		<key>PRODUCT_ID</key>
-		<string>PHSP</string>
+		<string>AME</string>
 		<key>RUM_ENABLED</key>
 		<true/>
 		<key>UPDATES_ENABLED</key>

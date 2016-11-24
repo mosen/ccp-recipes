@@ -220,6 +220,9 @@ class CreativeCloudFeed(Processor):
             # 10.10- (no minor version specified)
             # (empty array)
             self.env['minimum_os_version'] = compatibility_range.split('-')[0]
+        else:
+            # hacky workaround to avoid packager bailing when there is no minimum os version
+            self.env['minimum_os_version'] = ''
 
         if 'urls' in first_platform['languageSet'][0]:
             self.env['manifest_url'] = '{}{}'.format(
