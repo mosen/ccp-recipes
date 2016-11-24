@@ -8,6 +8,12 @@
         <string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
         <key>Input</key>
         <dict>
+			<key>MUNKI_REPO_SUBDIR</key>
+			<string>apps/AdobeCC</string>
+			<key>pkginfo</key>
+			<dict>
+				<!-- supply for example your own description, category, developer, etc. -->
+			</dict>
         </dict>
         <key>MinimumVersion</key>
         <string>0.4.0</string>
