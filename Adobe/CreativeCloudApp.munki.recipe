@@ -16,7 +16,7 @@
 			</dict>
         </dict>
         <key>MinimumVersion</key>
-        <string>0.4.0</string>
+        <string>1.0.0</string>
         <key>ParentRecipe</key>
         <string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
         <key>Process</key>
