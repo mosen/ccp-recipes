@@ -69,6 +69,17 @@ CUSTOMER_TYPES = ["enterprise", "team"]
 CCP_PREFS_FILE = os.path.expanduser(
     "~/Library/Application Support/Adobe/CCP/CCPPreferences.xml")
 
+CCP_ERROR_MSGS = {
+    "CustomerTypeMismatchError": \
+        ("Please check that your organization is of the correct "
+         "type, either 'enterprise' or 'team'."),
+    "TronWelcomeInputValidationError": \
+        ("Please check that your ORG_NAME matches one to which your "
+         "CCP-signed-in user ""belongs."),
+    "TronSerialNumberValidationError": \
+        ("Serial number validation failed."),
+}
+
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
     description = "Runs the CCP packager."
@@ -246,16 +257,9 @@ class CreativeCloudPackager(Processor):
             autopkg_error_msg = "CCP package build reported failure.\n"
             err_msg_type = results_elem.find('error/errorMessage')
             if err_msg_type is not None:
-                autopkg_error_msg += "Error type: '%s'\n" % err_msg_type.text
-            if err_msg_type.text == "CustomerTypeMismatchError":
-                autopkg_error_msg += (
-                    "Please check that your organization is of the correct "
-                    "type, either 'enterprise' or 'team'.\n")
-            if err_msg_type.text == "TronWelcomeInputValidationError":
-                autopkg_error_msg += (
-                    "Please check that your organization ID (you provided "
-                    "'%s') matches one to which your CCP-signed-in user "
-                    "belongs.\n") % self.env["organization_name"]
+                autopkg_error_msg += "Error type: '%s' - " % err_msg_type.text
+            if err_msg_type.text in CCP_ERROR_MSGS:
+                autopkg_error_msg += CCP_ERROR_MSGS[err_msg_type.text] + "\n"
             autopkg_error_msg += (
                 "Please inspect the PDApp log file at: %s. 'results' XML file "
                 "contents follow: \n%s" % (
