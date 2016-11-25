@@ -188,6 +188,10 @@ class CreativeCloudPackager(Processor):
             raise ProcessorError(
                 "customer_type input variable must be one of : %s" %
                 ", ".join(CUSTOMER_TYPES))
+        if customer_type != 'enterprise' and self.env.get('serial_number'):
+            raise ProcessorError(
+                ("Serial number was given, but serial numbers are only for "
+                 "use with 'enterprise' customer types."))
 
         jobid = uuid.uuid4()
         # Take input params
@@ -205,12 +209,18 @@ class CreativeCloudPackager(Processor):
             output_location=self.env["RECIPE_CACHE_DIR"],
             sap_code=self.env["product_id"],
             version=self.env["version"])
+        ccp_pkg_elem = ElementTree.fromstring(xml_data)
+        if self.env.get('serial_number'):
+            self.output('Adding serial number to ccp_automation xml')
+            serial = ElementTree.Element('serialNumber')
+            serial.text = self.env['serial_number']
+            create_pkg = ccp_pkg_elem.find('CreatePackage')
+            create_pkg.append(serial)
 
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
         xml_path = "{}/ccp_autopkg_{}.xml".format(self.env["RECIPE_CACHE_DIR"], jobid)
-        with open(xml_path, 'w+') as xml_fd:
-            xml_fd.write(xml_data)
+        ElementTree.ElementTree(ccp_pkg_elem).write(xml_path)
 
         cmd = [
             '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',

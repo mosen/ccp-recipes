@@ -32,6 +32,8 @@
             <false/>
             <key>ADMIN_PRIVILEGES_ENABLED</key>
             <false/>
+			<key>SERIAL_NUMBER</key>
+			<string></string>
         </dict>
         <key>MinimumVersion</key>
         <string>0.4.0</string>
@@ -71,6 +73,8 @@
                     <false/>
                     <key>admin_privileges_enabled</key>
                     <false/>
+					<key>serial_number</key>
+					<string>%SERIAL_NUMBER%</string>
                 </dict>
             </dict>
             <dict>
