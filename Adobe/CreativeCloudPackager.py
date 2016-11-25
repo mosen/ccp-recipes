@@ -35,7 +35,8 @@ __all__ = ["CreativeCloudPackager"]
 #
 # https://github.com/timsutton/adobe-ccp-automation/blob/master/ccp_auto
 
-TEMPLATE_XML = """<CCPPackage>
+TEMPLATE_XML = """<?xml version="1.0"?>
+<CCPPackage>
   <CreatePackage>
     <packageName>${package_name}</packageName>
     <packagingJobId>${packaging_job_id}</packagingJobId>
@@ -46,20 +47,20 @@ TEMPLATE_XML = """<CCPPackage>
     <!-- ProductCategory should be left 'Custom' -->
     <ProductCategory>Custom</ProductCategory>
     <matchOSLanguage>true</matchOSLanguage>
-	<IncludeUpdates>${include_updates}</IncludeUpdates>
-	<rumEnabled>${rum_enabled}</rumEnabled>
-	<updatesEnabled>${updates_enabled}</updatesEnabled>
-	<appsPanelEnabled>${apps_panel_enabled}</appsPanelEnabled>
-	<adminPrivilegesEnabled>${admin_privileges_enabled}</adminPrivilegesEnabled>
+    <IncludeUpdates>${include_updates}</IncludeUpdates>
+    <rumEnabled>${rum_enabled}</rumEnabled>
+    <updatesEnabled>${updates_enabled}</updatesEnabled>
+    <appsPanelEnabled>${apps_panel_enabled}</appsPanelEnabled>
+    <adminPrivilegesEnabled>${admin_privileges_enabled}</adminPrivilegesEnabled>
     <Language>
       <id>${language}</id>
     </Language>
-	<Products>
-		<Product>
-			<sapCode>${sap_code}</sapCode>
-			<version>${version}</version>
-		</Product>
-	</Products>
+    <Products>
+      <Product>
+        <sapCode>${sap_code}</sapCode>
+        <version>${version}</version>
+      </Product>
+    </Products>
   </CreatePackage>
 </CCPPackage>
 """
