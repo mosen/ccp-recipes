@@ -21,6 +21,7 @@
 # pylint: disable=line-too-long
 
 import os
+import shutil
 import subprocess
 
 from string import Template
@@ -179,7 +180,10 @@ class CreativeCloudPackager(Processor):
         self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root,
                                                         "Build/%s_Uninstall.pkg" % self.env["package_name"])
 
-        if os.path.isdir(expected_output_root):
+        saved_automation_xml_path = os.path.join(expected_output_root,
+                                                  'ccp_automation_input.xml')
+
+        if os.path.exists(saved_automation_xml_path):
             self.output("Naively returning early because we seem to already have a built package.")
             return
 
@@ -274,6 +278,14 @@ class CreativeCloudPackager(Processor):
                     open(results_file, 'r').read()
                 )
             )
+
+        # Sanity-check that we really do have our install package!
+        if not os.path.exists(self.env["pkg_path"]):
+            raise ProcessorError(
+                "CCP exited successfully, but no expected installer package "
+                "at %s exists." % self.env["pkg_path"])
+
+        shutil.copy(xml_path, saved_automation_xml_path)
 
         # Save PackageInfo.txt
         packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
