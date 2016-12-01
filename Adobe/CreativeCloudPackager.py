@@ -21,6 +21,7 @@
 # pylint: disable=line-too-long
 
 import os
+import shutil
 import subprocess
 
 from string import Template
@@ -35,7 +36,8 @@ __all__ = ["CreativeCloudPackager"]
 #
 # https://github.com/timsutton/adobe-ccp-automation/blob/master/ccp_auto
 
-TEMPLATE_XML = """<CCPPackage>
+TEMPLATE_XML = """<?xml version="1.0"?>
+<CCPPackage>
   <CreatePackage>
     <packageName>${package_name}</packageName>
     <packagingJobId>${packaging_job_id}</packagingJobId>
@@ -46,20 +48,20 @@ TEMPLATE_XML = """<CCPPackage>
     <!-- ProductCategory should be left 'Custom' -->
     <ProductCategory>Custom</ProductCategory>
     <matchOSLanguage>true</matchOSLanguage>
-	<IncludeUpdates>${include_updates}</IncludeUpdates>
-	<rumEnabled>${rum_enabled}</rumEnabled>
-	<updatesEnabled>${updates_enabled}</updatesEnabled>
-	<appsPanelEnabled>${apps_panel_enabled}</appsPanelEnabled>
-	<adminPrivilegesEnabled>${admin_privileges_enabled}</adminPrivilegesEnabled>
+    <IncludeUpdates>${include_updates}</IncludeUpdates>
+    <rumEnabled>${rum_enabled}</rumEnabled>
+    <updatesEnabled>${updates_enabled}</updatesEnabled>
+    <appsPanelEnabled>${apps_panel_enabled}</appsPanelEnabled>
+    <adminPrivilegesEnabled>${admin_privileges_enabled}</adminPrivilegesEnabled>
     <Language>
       <id>${language}</id>
     </Language>
-	<Products>
-		<Product>
-			<sapCode>${sap_code}</sapCode>
-			<version>${version}</version>
-		</Product>
-	</Products>
+    <Products>
+      <Product>
+        <sapCode>${sap_code}</sapCode>
+        <version>${version}</version>
+      </Product>
+    </Products>
   </CreatePackage>
 </CCPPackage>
 """
@@ -67,6 +69,17 @@ TEMPLATE_XML = """<CCPPackage>
 CUSTOMER_TYPES = ["enterprise", "team"]
 CCP_PREFS_FILE = os.path.expanduser(
     "~/Library/Application Support/Adobe/CCP/CCPPreferences.xml")
+
+CCP_ERROR_MSGS = {
+    "CustomerTypeMismatchError": \
+        ("Please check that your organization is of the correct "
+         "type, either 'enterprise' or 'team'."),
+    "TronWelcomeInputValidationError": \
+        ("Please check that your ORG_NAME matches one to which your "
+         "CCP-signed-in user ""belongs."),
+    "TronSerialNumberValidationError": \
+        ("Serial number validation failed."),
+}
 
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
@@ -167,7 +180,10 @@ class CreativeCloudPackager(Processor):
         self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root,
                                                         "Build/%s_Uninstall.pkg" % self.env["package_name"])
 
-        if os.path.isdir(expected_output_root):
+        saved_automation_xml_path = os.path.join(expected_output_root,
+                                                  'ccp_automation_input.xml')
+
+        if os.path.exists(saved_automation_xml_path):
             self.output("Naively returning early because we seem to already have a built package.")
             return
 
@@ -187,6 +203,10 @@ class CreativeCloudPackager(Processor):
             raise ProcessorError(
                 "customer_type input variable must be one of : %s" %
                 ", ".join(CUSTOMER_TYPES))
+        if customer_type != 'enterprise' and self.env.get('serial_number'):
+            raise ProcessorError(
+                ("Serial number was given, but serial numbers are only for "
+                 "use with 'enterprise' customer types."))
 
         jobid = uuid.uuid4()
         # Take input params
@@ -204,12 +224,18 @@ class CreativeCloudPackager(Processor):
             output_location=self.env["RECIPE_CACHE_DIR"],
             sap_code=self.env["product_id"],
             version=self.env["version"])
+        ccp_pkg_elem = ElementTree.fromstring(xml_data)
+        if self.env.get('serial_number'):
+            self.output('Adding serial number to ccp_automation xml')
+            serial = ElementTree.Element('serialNumber')
+            serial.text = self.env['serial_number']
+            create_pkg = ccp_pkg_elem.find('CreatePackage')
+            create_pkg.append(serial)
 
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
         xml_path = "{}/ccp_autopkg_{}.xml".format(self.env["RECIPE_CACHE_DIR"], jobid)
-        with open(xml_path, 'w+') as xml_fd:
-            xml_fd.write(xml_data)
+        ElementTree.ElementTree(ccp_pkg_elem).write(xml_path)
 
         cmd = [
             '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
@@ -235,16 +261,9 @@ class CreativeCloudPackager(Processor):
             autopkg_error_msg = "CCP package build reported failure.\n"
             err_msg_type = results_elem.find('error/errorMessage')
             if err_msg_type is not None:
-                autopkg_error_msg += "Error type: '%s'\n" % err_msg_type.text
-            if err_msg_type.text == "CustomerTypeMismatchError":
-                autopkg_error_msg += (
-                    "Please check that your organization is of the correct "
-                    "type, either 'enterprise' or 'team'.\n")
-            if err_msg_type.text == "TronWelcomeInputValidationError":
-                autopkg_error_msg += (
-                    "Please check that your organization ID (you provided "
-                    "'%s') matches one to which your CCP-signed-in user "
-                    "belongs.\n") % self.env["organization_name"]
+                autopkg_error_msg += "Error type: '%s' - " % err_msg_type.text
+            if err_msg_type.text in CCP_ERROR_MSGS:
+                autopkg_error_msg += CCP_ERROR_MSGS[err_msg_type.text] + "\n"
             autopkg_error_msg += (
                 "Please inspect the PDApp log file at: %s. 'results' XML file "
                 "contents follow: \n%s" % (
@@ -259,6 +278,14 @@ class CreativeCloudPackager(Processor):
                     open(results_file, 'r').read()
                 )
             )
+
+        # Sanity-check that we really do have our install package!
+        if not os.path.exists(self.env["pkg_path"]):
+            raise ProcessorError(
+                "CCP exited successfully, but no expected installer package "
+                "at %s exists." % self.env["pkg_path"])
+
+        shutil.copy(xml_path, saved_automation_xml_path)
 
         # Save PackageInfo.txt
         packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
