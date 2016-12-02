@@ -58,6 +58,15 @@ def to_camel_case(snake_str):
     # with the 'title' method and join them together.
     return components[0] + "".join(x.title() for x in components[1:])
 
+def boolify(string_bool):
+    """Return a boolean True or False given 'true', 'false' input as strings,
+    else None"""
+    result = None
+    if string_bool in ['true', 'false']:
+        result = True if string_bool == 'true' else False
+    return result
+
+
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
     description = "Runs the CCP packager."
@@ -135,6 +144,19 @@ class CreativeCloudPackager(Processor):
             "description": "Version of CCP tools used to build the package."
         },
     }
+    # input variable names that map directly to automation XML element tag names
+    # except snake_case -> camelCase
+    XML_MAPPABLE_NAMES = [
+        'package_name',
+        'customer_type',
+        'organization_name',
+        'customer_type',
+        'rum_enabled',
+        'updates_enabled',
+        'include_updates',
+        'apps_panel_enabled',
+        'admin_privileges_enabled',
+    ]
 
     def ccp_preferences(self):
         """Get information about the currently signed-in CCP user, if available."""
@@ -148,21 +170,60 @@ class CreativeCloudPackager(Processor):
             prefs["customer_type"] = user_type_elem.text.lower().split('_')[0]
         return prefs
 
+    def compare_ccp_pkg(self):
+        pass
+
+    def automation_manifest_from_env(self):
+        '''Returns a dict containing CCP automation data derived from the env. Omits
+        irrelevant data such as output location and packaging job id.'''
+        manifest = {}
+        # copy all defined params for this processor into a top-level dict
+        for param in self.input_variables.keys():
+            if param in self.env.keys():
+                manifest[param] = self.env[param]
+        manifest['packages'] = []
+        manifest['packages'].append({
+            'sap_code': self.env['product_id'],
+            'version': self.env['version'],
+        })
+        manifest['language'] = self.env['language']
+        return manifest
+
+    def automation_manifest_from_xml(self, xml_path):
+        '''Returns the same dict as automation_manifest_from_env except it is loaded
+        from an existing XML input file.'''
+        params = {}
+
+        pkg_elem = ElementTree.parse(xml_path).getroot().find('CreatePackage')
+        # build all the top-level elements
+        for param in self.XML_MAPPABLE_NAMES:
+            transformed_param = to_camel_case(param)
+            elem = pkg_elem.find(transformed_param)
+            if elem is not None:
+                if boolify(elem.text):
+                    params[param] = boolify(elem.text)
+                else:
+                    params[param] = elem.text
+        if pkg_elem.find('IncludeUpdates'):
+            updates = pkg_elem.find('IncludeUpdates').text
+            if updates is not None:
+                params['include_updates'] = boolify(updates)
+
+        # Nested items
+        if pkg_elem.findall('Language/id'):
+            params['language'] = pkg_elem.findall('Language/id')[0].text
+
+        if pkg_elem.findall('Products/Product'):
+            prod = pkg_elem.findall('Products/Product')[0]
+            params['product_id'] = prod.find('sapCode').text
+            params['version'] = prod.find('version').text
+
+        # TODO: deal with checking serial number
+        return params
+
     def automation_xml(self):
         params = {}
-        # params that directly to env params
-        env_params_list = [
-            'package_name',
-            'customer_type',
-            'organization_name',
-            'customer_type',
-            'rum_enabled',
-            'updates_enabled',
-            'include_updates',
-            'apps_panel_enabled',
-            'admin_privileges_enabled',
-        ]
-        for param in env_params_list:
+        for param in self.XML_MAPPABLE_NAMES:
             params[param] = self.env[param]
         params.update({
             'output_location': self.env['RECIPE_CACHE_DIR'],
@@ -182,7 +243,7 @@ class CreativeCloudPackager(Processor):
         match_os.text = 'true'
         pkg_elem.append(match_os)
 
-        # substitutiong snake case for camel case for all the top-level subelements
+        # substituting snake case for camel case for all the top-level subelements
         for param, value in params.iteritems():
             transformed_param = to_camel_case(param)
             # 'IncludeUpdates' has a different casing pattern!
@@ -233,9 +294,7 @@ class CreativeCloudPackager(Processor):
         return out
 
     def main(self):
-        # Handle any pre-existing package at the expected location, and end early if it matches our
-        # input manifest
-        # TODO: for now we just continue on if the automation xml file already exists
+        # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
         self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
         self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root,
@@ -244,7 +303,16 @@ class CreativeCloudPackager(Processor):
         saved_automation_xml_path = os.path.join(expected_output_root,
                                                   'ccp_automation_input.xml')
 
+        # Handle any pre-existing package at the expected location, and end early if it matches our
+        # input manifest
+        # TODO: for now we just continue on if the automation xml file already exists
         if os.path.exists(saved_automation_xml_path):
+            existing_ccp_automation = self.automation_manifest_from_xml(saved_automation_xml_path)
+            print existing_ccp_automation
+            new_ccp_automation = self.automation_manifest_from_env()
+            print new_ccp_automation
+            print "EXITING EARLY!"
+            exit()
             self.output("Naively returning early because we seem to already have a built package.")
             return
 
