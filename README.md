@@ -47,6 +47,17 @@ There is a special value for `VERSION` which is 'latest'. This means the latest 
 
 Now run your override recipe and you should see CCP download and build the package!
 
+## Troubleshooting
+
+- Most CCP related errors will return a validation error, even though they may be completely unrelated to validation. 
+You should check the PDApp.log file to get to the real cause of the problem.
+
+- You may see an error if there is a new CCP update pending. You will need to launch CCP manually
+to perform the update before you can proceed.
+
+- CCP will quit immediately if a package with the same version already exists in the output folder. This processor should
+detect the existence of those files and skip packaging if this is the case.
+
 ## Processor Reference
 
 ### CreativeCloudFeed
