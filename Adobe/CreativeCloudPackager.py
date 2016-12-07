@@ -200,14 +200,13 @@ class CreativeCloudPackager(Processor):
             transformed_param = to_camel_case(param)
             elem = pkg_elem.find(transformed_param)
             if elem is not None:
-                if boolify(elem.text):
+                if boolify(elem.text) is not None:
                     params[param] = boolify(elem.text)
                 else:
                     params[param] = elem.text
-        if pkg_elem.find('IncludeUpdates'):
-            updates = pkg_elem.find('IncludeUpdates').text
-            if updates is not None:
-                params['include_updates'] = boolify(updates)
+        if pkg_elem.find('IncludeUpdates') is not None:
+            # updates =
+            params['include_updates'] = boolify(pkg_elem.find('IncludeUpdates').text)
 
         # Nested items
         if pkg_elem.findall('Language/id'):
@@ -293,29 +292,7 @@ class CreativeCloudPackager(Processor):
                                  "xmllint. Stderr output:\n%s" % err)
         return out
 
-    def main(self):
-        # establish some of our expected build paths
-        expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
-        self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
-        self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root,
-                                                        "Build/%s_Uninstall.pkg" % self.env["package_name"])
-
-        saved_automation_xml_path = os.path.join(expected_output_root,
-                                                  'ccp_automation_input.xml')
-
-        # Handle any pre-existing package at the expected location, and end early if it matches our
-        # input manifest
-        # TODO: for now we just continue on if the automation xml file already exists
-        if os.path.exists(saved_automation_xml_path):
-            existing_ccp_automation = self.automation_manifest_from_xml(saved_automation_xml_path)
-            print existing_ccp_automation
-            new_ccp_automation = self.automation_manifest_from_env()
-            print new_ccp_automation
-            print "EXITING EARLY!"
-            exit()
-            self.output("Naively returning early because we seem to already have a built package.")
-            return
-
+    def set_customer_type(self):
         # Set the customer type, using CCP's preferences if none provided
         if not self.env.get("customer_type"):
             ccp_prefs = self.ccp_preferences()
@@ -335,6 +312,31 @@ class CreativeCloudPackager(Processor):
             raise ProcessorError(
                 ("Serial number was given, but serial numbers are only for "
                  "use with 'enterprise' customer types."))
+
+    def main(self):
+        # establish some of our expected build paths
+        expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
+        self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
+        self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root,
+                                                        "Build/%s_Uninstall.pkg" % self.env["package_name"])
+
+        saved_automation_xml_path = os.path.join(expected_output_root,
+                                                  'ccp_automation_input.xml')
+
+        self.set_customer_type()
+        # Handle any pre-existing package at the expected location, and end early if it matches our
+        # input manifest
+        # TODO: for now we just continue on if the automation xml file already exists
+        if os.path.exists(saved_automation_xml_path):
+            existing_ccp_automation = self.automation_manifest_from_xml(saved_automation_xml_path)
+            print existing_ccp_automation
+            new_ccp_automation = self.automation_manifest_from_env()
+            print new_ccp_automation
+            print "EXITING EARLY!"
+            exit()
+            self.output("Naively returning early because we seem to already have a built package.")
+            return
+
 
         xml_data = self.automation_xml()
         xml_workdir = os.path.join(self.env["RECIPE_CACHE_DIR"], 'automation_xml')
