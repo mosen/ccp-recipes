@@ -234,7 +234,7 @@ class CreativeCloudPackager(Processor):
 
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
-        xml_path = "{}/ccp_autopkg_{}.xml".format(self.env["RECIPE_CACHE_DIR"], jobid)
+        xml_path = "{}/ccp_autopkg.xml".format(self.env["RECIPE_CACHE_DIR"])
         ElementTree.ElementTree(ccp_pkg_elem).write(xml_path)
 
         cmd = [

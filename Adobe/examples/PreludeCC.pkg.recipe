@@ -3,13 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>Identifier</key>
-	<string>local.munki.Adobe.MuseCC</string>
+	<string>local.pkg.Adobe.PreludeCC</string>
 	<key>Input</key>
 	<dict>
-		<key>NAME</key>
-		<string>AdobeMuseCC</string>
-		<key>MUNKI_REPO_SUBDIR</key>
-		<string>apps/Adobe</string>
 		<key>ADMIN_PRIVILEGES_ENABLED</key>
 		<false/>
 		<key>APPS_PANEL_ENABLED</key>
@@ -20,10 +16,12 @@
 		<true/>
 		<key>LICENSE_TYPE</key>
 		<string>team</string>
+		<key>NAME</key>
+		<string>AdobePreludeCC</string>
 		<key>ORG_NAME</key>
 		<string>ADMIN_PLEASE_CHANGE</string>
 		<key>PRODUCT_ID</key>
-		<string>MUSE</string>
+		<string>PRLD</string>
 		<key>RUM_ENABLED</key>
 		<true/>
 		<key>UPDATES_ENABLED</key>
@@ -31,9 +29,7 @@
 		<key>VERSION</key>
 		<string>latest</string>
 	</dict>
-	<key>MinimumVersion</key>
-	<string>0.4.0</string>
 	<key>ParentRecipe</key>
-	<string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
+	<string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
 </dict>
 </plist>
