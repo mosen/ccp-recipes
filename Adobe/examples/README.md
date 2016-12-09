@@ -15,3 +15,5 @@ supplying the required `ORG_NAME` variable on the command line eg:
 - Edge Code
 - Experience Design
 - Lightroom minor version will be incorrect due to patches not detected.
+- Preview CC never creates an Uninstall pkg
+

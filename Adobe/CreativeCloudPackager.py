@@ -60,6 +60,15 @@ CCP_ERROR_MSGS = {
 #   </error>
 # </TronResult>
 
+# Note: if the user supplies an incorrect SAP Code or a product that cannot be packaged individually (like AAM)
+# you will receive this error:
+# <TronResult version="1.0">
+# <error>
+# <errorCode>3</errorCode>
+# <shouldRetry>false</shouldRetry>
+# <errorMessage>productNotFound</errorMessage>
+# </error>
+# </TronResult>
 
 
 class CreativeCloudPackager(Processor):
