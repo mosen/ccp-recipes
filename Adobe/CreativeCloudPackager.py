@@ -23,10 +23,10 @@
 import os
 import shutil
 import subprocess
-
-from string import Template
 import uuid
+
 from xml.etree import ElementTree
+import FoundationPlist
 
 from autopkglib import Processor, ProcessorError
 
@@ -35,36 +35,6 @@ __all__ = ["CreativeCloudPackager"]
 # https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html
 #
 # https://github.com/timsutton/adobe-ccp-automation/blob/master/ccp_auto
-
-TEMPLATE_XML = """<?xml version="1.0"?>
-<CCPPackage>
-  <CreatePackage>
-    <packageName>${package_name}</packageName>
-    <packagingJobId>${packaging_job_id}</packagingJobId>
-    <outputLocation>${output_location}</outputLocation>
-    <is64Bit>true</is64Bit>
-    <customerType>${customer_type}</customerType>
-    <organizationName>${organization_name}</organizationName>
-    <!-- ProductCategory should be left 'Custom' -->
-    <ProductCategory>Custom</ProductCategory>
-    <matchOSLanguage>true</matchOSLanguage>
-    <IncludeUpdates>${include_updates}</IncludeUpdates>
-    <rumEnabled>${rum_enabled}</rumEnabled>
-    <updatesEnabled>${updates_enabled}</updatesEnabled>
-    <appsPanelEnabled>${apps_panel_enabled}</appsPanelEnabled>
-    <adminPrivilegesEnabled>${admin_privileges_enabled}</adminPrivilegesEnabled>
-    <Language>
-      <id>${language}</id>
-    </Language>
-    <Products>
-      <Product>
-        <sapCode>${sap_code}</sapCode>
-        <version>${version}</version>
-      </Product>
-    </Products>
-  </CreatePackage>
-</CCPPackage>
-"""
 
 CUSTOMER_TYPES = ["enterprise", "team"]
 CCP_PREFS_FILE = os.path.expanduser(
@@ -80,6 +50,17 @@ CCP_ERROR_MSGS = {
     "TronSerialNumberValidationError": \
         ("Serial number validation failed."),
 }
+# Note: TronWelcomeInputValidationError can also happen if  a file or folder
+# already exists at the package path given. Sample result output in that case:
+# <TronResult version="1.0">
+#   <error>
+#     <errorCode>2</errorCode>
+#     <shouldRetry>false</shouldRetry>
+#     <errorMessage>TronWelcomeInputValidationError</errorMessage>
+#   </error>
+# </TronResult>
+
+
 
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
@@ -171,71 +152,173 @@ class CreativeCloudPackager(Processor):
             prefs["customer_type"] = user_type_elem.text.lower().split('_')[0]
         return prefs
 
+    def automation_manifest_from_env(self, scrub_serial=False):
+        '''Returns a dict containing CCP automation data derived from the env. Omits
+        irrelevant data such as output location and packaging job id.
+        scrub_serial will redact the serial number in cases where this dict
+        is being recorded to disk (along with the built package).'''
+        manifest = {}
+        # copy all defined params for this processor into a top-level dict
+        for param in self.input_variables.keys():
+            if param in self.env.keys():
+                manifest[param] = self.env[param]
+        manifest['products'] = []
+        manifest['products'].append({
+            'sap_code': self.env['product_id'],
+            'version': self.env['version'],
+        })
+        manifest['language'] = self.env['language']
+        if self.env.get('serial_number'):
+            manifest['serial_number'] = self.env['serial_number']
+            if scrub_serial:
+                manifest['serial_number'] = 'REDACTED'
+        else:
+            # just remove serial_number from altogether if it was empty, to
+            # avoid confusion
+            manifest.pop('serial_number', None)
+        return manifest
+
+    def automation_xml(self):
+        '''Returns the complete pretty-formatted XML string for a CCP automation
+        session.'''
+        params = self.automation_manifest_from_env()
+        params.update({
+            'output_location': self.env['RECIPE_CACHE_DIR'],
+            'packaging_job_id': str(uuid.uuid4()),
+        })
+
+        # Begin assembling XML Element
+        pkg_elem = ElementTree.Element('CreatePackage')
+        # add some hardcoded elements
+        category = ElementTree.Element('ProductCategory')
+        category.text = 'Custom'
+        pkg_elem.append(category)
+        is_64 = ElementTree.Element('is64Bit')
+        is_64.text = 'true'
+        pkg_elem.append(is_64)
+        match_os = ElementTree.Element('matchOSLanguage')
+        match_os.text = 'true'
+        pkg_elem.append(match_os)
+
+        # substituting snake case for camel case for all top-level elements
+        # except the 'products' list
+        for param, value in params.iteritems():
+            if param == 'products':
+                continue
+
+            # Convert param from snake_case to camelCase
+            # http://stackoverflow.com/a/19053800
+            components = param.split('_')
+            transformed_param = components[0] + \
+                                "".join(x.title() for x in components[1:])
+            # ..except 'IncludeUpdates', which has a different casing pattern!
+            if param == 'include_updates':
+                transformed_param = 'IncludeUpdates'
+            elem = ElementTree.Element(transformed_param)
+            if isinstance(value, bool):
+                value = str(value).lower()
+            elem.text = value
+            pkg_elem.append(elem)
+        # language
+        lang = ElementTree.Element('Language')
+        lang.append(ElementTree.Element('id'))
+        lang.find('id').text = params['language']
+
+        # products
+        products = ElementTree.Element('Products')
+        for prod in params['products']:
+            product = ElementTree.Element('Product')
+            sap = ElementTree.Element('sapCode')
+            sap.text = prod['sap_code']
+            ver = ElementTree.Element('version')
+            ver.text = prod['version']
+            product.append(sap)
+            product.append(ver)
+            products.append(product)
+        pkg_elem.append(products)
+
+        # serial
+        if params.get('serial_number'):
+            self.output('Adding serial number to ccp_automation xml')
+            serial = ElementTree.Element('serialNumber')
+            serial.text = params['serial_number']
+            pkg_elem.append(serial)
+
+        pkg_elem.append(lang)
+        xml_root = ElementTree.Element('CCPPackage')
+        xml_root.append(pkg_elem)
+
+        # run it through `xmllint --format` just to save it pretty :/
+        xml_string = ElementTree.tostring(xml_root, encoding='utf8', method='xml')
+        proc = subprocess.Popen(['/usr/bin/xmllint', '--format', '-'],
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE)
+        out, err = proc.communicate(xml_string)
+        if proc.returncode:
+            raise ProcessorError("Unexpected error from running XML output through "
+                                 "xmllint. Stderr output:\n%s" % err)
+        return out
+
+    def set_customer_type(self):
+        # Set the customer type, using CCP's preferences if none provided
+        if not self.env.get("customer_type"):
+            ccp_prefs = self.ccp_preferences()
+            self.env['customer_type'] = ccp_prefs.get("customer_type")
+            if not self.env.get("customer_type"):
+                raise ProcessorError(
+                    "No customer_type input provided and unable to read one "
+                    "from %s" % CCP_PREFS_FILE)
+            self.output("Using customer type '%s' found in CCPPreferences: %s'"
+                        % (self.env['customer_type'], CCP_PREFS_FILE))
+
+        if self.env['customer_type'] not in CUSTOMER_TYPES:
+            raise ProcessorError(
+                "customer_type input variable must be one of : %s" %
+                ", ".join(CUSTOMER_TYPES))
+        if self.env['customer_type'] != 'enterprise' and self.env.get('serial_number'):
+            raise ProcessorError(
+                ("Serial number was given, but serial numbers are only for "
+                 "use with 'enterprise' customer types."))
+
     def main(self):
-        # Handle any pre-existing package at the expected location, and end early if it matches our
-        # input manifest
-        # TODO: for now we just continue on if the dir already exists
+        # TODO: check and fail immediately if CCP is already running
+        # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
         self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
         self.env["uninstaller_pkg_path"] = os.path.join(expected_output_root,
                                                         "Build/%s_Uninstall.pkg" % self.env["package_name"])
 
         saved_automation_xml_path = os.path.join(expected_output_root,
-                                                  'ccp_automation_input.xml')
+                                                 '.ccp_automation_input.xml')
+        automation_manifest_plist_path = os.path.join(expected_output_root,
+                                                      '.autopkg_manifest.plist')
+        self.set_customer_type()
+        # Handle any pre-existing package at the expected location, and end early if it matches our
+        # input manifest
+        if os.path.exists(automation_manifest_plist_path):
+            existing_manifest = FoundationPlist.readPlist(automation_manifest_plist_path)
+            new_manifest = self.automation_manifest_from_env(scrub_serial=True)
+            self.output("Found existing CCP package build automation info, comparing")
+            self.output("existing build: %s" % existing_manifest)
+            self.output("current build: %s" % new_manifest)
+            if new_manifest == existing_manifest:
+                self.output("Returning early because we have an existing package "
+                            "with the same parameters.")
+                return
 
-        if os.path.exists(saved_automation_xml_path):
-            self.output("Naively returning early because we seem to already have a built package.")
-            return
+        # Going forward with building, set up or clear needed directories
+        xml_workdir = os.path.join(self.env["RECIPE_CACHE_DIR"], 'automation_xml')
+        if not os.path.exists(xml_workdir):
+            os.mkdir(xml_workdir)
+        if os.path.isdir(expected_output_root):
+            shutil.rmtree(expected_output_root)
 
-        # Set the customer type, using CCP's preferences if none provided
-        customer_type = self.env.get("customer_type")
-        if not customer_type:
-            ccp_prefs = self.ccp_preferences()
-            customer_type = ccp_prefs.get("customer_type")
-            if not customer_type:
-                raise ProcessorError(
-                    "No customer_type input provided and unable to read one "
-                    "from %s" % CCP_PREFS_FILE)
-            self.output("Using customer type '%s' found in CCPPreferences: %s'"
-                        % (customer_type, CCP_PREFS_FILE))
-
-        if customer_type not in CUSTOMER_TYPES:
-            raise ProcessorError(
-                "customer_type input variable must be one of : %s" %
-                ", ".join(CUSTOMER_TYPES))
-        if customer_type != 'enterprise' and self.env.get('serial_number'):
-            raise ProcessorError(
-                ("Serial number was given, but serial numbers are only for "
-                 "use with 'enterprise' customer types."))
-
-        jobid = uuid.uuid4()
-        # Take input params
-        xml_data = Template(TEMPLATE_XML).safe_substitute(
-            package_name=self.env["package_name"],
-            packaging_job_id=jobid,
-            customer_type=customer_type,
-            organization_name=self.env["organization_name"],
-            include_updates=self.env["include_updates"],
-            rum_enabled=self.env["rum_enabled"],
-            language=self.env["language"],
-            updates_enabled=self.env["updates_enabled"],
-            apps_panel_enabled=self.env["apps_panel_enabled"],
-            admin_privileges_enabled=self.env["admin_privileges_enabled"],
-            output_location=self.env["RECIPE_CACHE_DIR"],
-            sap_code=self.env["product_id"],
-            version=self.env["version"])
-        ccp_pkg_elem = ElementTree.fromstring(xml_data)
-        if self.env.get('serial_number'):
-            self.output('Adding serial number to ccp_automation xml')
-            serial = ElementTree.Element('serialNumber')
-            serial.text = self.env['serial_number']
-            create_pkg = ccp_pkg_elem.find('CreatePackage')
-            create_pkg.append(serial)
-
+        xml_data = self.automation_xml()
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
-        xml_path = "{}/ccp_autopkg.xml".format(self.env["RECIPE_CACHE_DIR"])
-        ElementTree.ElementTree(ccp_pkg_elem).write(xml_path)
+        xml_path = os.path.join(xml_workdir, 'ccp_automation_%s.xml' % self.env['NAME'])
+        with open(xml_path, 'w') as fd:
+            fd.write(xml_data)
 
         cmd = [
             '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
@@ -285,7 +368,13 @@ class CreativeCloudPackager(Processor):
                 "CCP exited successfully, but no expected installer package "
                 "at %s exists." % self.env["pkg_path"])
 
+        # Save both the automation XML for posterity and our manifest plist for
+        # later comparison
         shutil.copy(xml_path, saved_automation_xml_path)
+        # TODO: we aren't scrubbing the automation XML file at all
+        FoundationPlist.writePlist(
+            self.automation_manifest_from_env(scrub_serial=True),
+            automation_manifest_plist_path)
 
         # Save PackageInfo.txt
         packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
