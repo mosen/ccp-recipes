@@ -23,10 +23,10 @@
 import os
 import shutil
 import subprocess
-
-from string import Template
 import uuid
+
 from xml.etree import ElementTree
+import FoundationPlist
 
 from autopkglib import Processor, ProcessorError
 
@@ -50,21 +50,16 @@ CCP_ERROR_MSGS = {
     "TronSerialNumberValidationError": \
         ("Serial number validation failed."),
 }
+# Note: TronWelcomeInputValidationError can also happen if  a file or folder
+# already exists at the package path given. Sample result output in that case:
+# <TronResult version="1.0">
+#   <error>
+#     <errorCode>2</errorCode>
+#     <shouldRetry>false</shouldRetry>
+#     <errorMessage>TronWelcomeInputValidationError</errorMessage>
+#   </error>
+# </TronResult>
 
-# http://stackoverflow.com/a/19053800
-def to_camel_case(snake_str):
-    components = snake_str.split('_')
-    # We capitalize the first letter of each component except the first one
-    # with the 'title' method and join them together.
-    return components[0] + "".join(x.title() for x in components[1:])
-
-def boolify(string_bool):
-    """Return a boolean True or False given 'true', 'false' input as strings,
-    else None"""
-    result = None
-    if string_bool in ['true', 'false']:
-        result = True if string_bool == 'true' else False
-    return result
 
 
 class CreativeCloudPackager(Processor):
@@ -144,19 +139,6 @@ class CreativeCloudPackager(Processor):
             "description": "Version of CCP tools used to build the package."
         },
     }
-    # input variable names that map directly to automation XML element tag names
-    # except snake_case -> camelCase
-    XML_MAPPABLE_NAMES = [
-        'package_name',
-        'customer_type',
-        'organization_name',
-        'customer_type',
-        'rum_enabled',
-        'updates_enabled',
-        'include_updates',
-        'apps_panel_enabled',
-        'admin_privileges_enabled',
-    ]
 
     def ccp_preferences(self):
         """Get information about the currently signed-in CCP user, if available."""
@@ -170,60 +152,36 @@ class CreativeCloudPackager(Processor):
             prefs["customer_type"] = user_type_elem.text.lower().split('_')[0]
         return prefs
 
-    def compare_ccp_pkg(self):
-        pass
-
-    def automation_manifest_from_env(self):
+    def automation_manifest_from_env(self, scrub_serial=False):
         '''Returns a dict containing CCP automation data derived from the env. Omits
-        irrelevant data such as output location and packaging job id.'''
+        irrelevant data such as output location and packaging job id.
+        scrub_serial will redact the serial number in cases where this dict
+        is being recorded to disk (along with the built package).'''
         manifest = {}
         # copy all defined params for this processor into a top-level dict
         for param in self.input_variables.keys():
             if param in self.env.keys():
                 manifest[param] = self.env[param]
-        manifest['packages'] = []
-        manifest['packages'].append({
+        manifest['products'] = []
+        manifest['products'].append({
             'sap_code': self.env['product_id'],
             'version': self.env['version'],
         })
         manifest['language'] = self.env['language']
+        if self.env.get('serial_number'):
+            manifest['serial_number'] = self.env['serial_number']
+            if scrub_serial:
+                manifest['serial_number'] = 'REDACTED'
+        else:
+            # just remove serial_number from altogether if it was empty, to
+            # avoid confusion
+            manifest.pop('serial_number', None)
         return manifest
 
-    def automation_manifest_from_xml(self, xml_path):
-        '''Returns the same dict as automation_manifest_from_env except it is loaded
-        from an existing XML input file.'''
-        params = {}
-
-        pkg_elem = ElementTree.parse(xml_path).getroot().find('CreatePackage')
-        # build all the top-level elements
-        for param in self.XML_MAPPABLE_NAMES:
-            transformed_param = to_camel_case(param)
-            elem = pkg_elem.find(transformed_param)
-            if elem is not None:
-                if boolify(elem.text) is not None:
-                    params[param] = boolify(elem.text)
-                else:
-                    params[param] = elem.text
-        if pkg_elem.find('IncludeUpdates') is not None:
-            # updates =
-            params['include_updates'] = boolify(pkg_elem.find('IncludeUpdates').text)
-
-        # Nested items
-        if pkg_elem.findall('Language/id'):
-            params['language'] = pkg_elem.findall('Language/id')[0].text
-
-        if pkg_elem.findall('Products/Product'):
-            prod = pkg_elem.findall('Products/Product')[0]
-            params['product_id'] = prod.find('sapCode').text
-            params['version'] = prod.find('version').text
-
-        # TODO: deal with checking serial number
-        return params
-
     def automation_xml(self):
-        params = {}
-        for param in self.XML_MAPPABLE_NAMES:
-            params[param] = self.env[param]
+        '''Returns the complete pretty-formatted XML string for a CCP automation
+        session.'''
+        params = self.automation_manifest_from_env()
         params.update({
             'output_location': self.env['RECIPE_CACHE_DIR'],
             'packaging_job_id': str(uuid.uuid4()),
@@ -242,10 +200,18 @@ class CreativeCloudPackager(Processor):
         match_os.text = 'true'
         pkg_elem.append(match_os)
 
-        # substituting snake case for camel case for all the top-level subelements
+        # substituting snake case for camel case for all top-level elements
+        # except the 'products' list
         for param, value in params.iteritems():
-            transformed_param = to_camel_case(param)
-            # 'IncludeUpdates' has a different casing pattern!
+            if param == 'products':
+                continue
+
+            # Convert param from snake_case to camelCase
+            # http://stackoverflow.com/a/19053800
+            components = param.split('_')
+            transformed_param = components[0] + \
+                                "".join(x.title() for x in components[1:])
+            # ..except 'IncludeUpdates', which has a different casing pattern!
             if param == 'include_updates':
                 transformed_param = 'IncludeUpdates'
             elem = ElementTree.Element(transformed_param)
@@ -256,25 +222,26 @@ class CreativeCloudPackager(Processor):
         # language
         lang = ElementTree.Element('Language')
         lang.append(ElementTree.Element('id'))
-        lang.find('id').text = self.env['language']
+        lang.find('id').text = params['language']
 
         # products
         products = ElementTree.Element('Products')
-        product = ElementTree.Element('Product')
-        sap = ElementTree.Element('sapCode')
-        sap.text = self.env['product_id']
-        ver = ElementTree.Element('version')
-        ver.text = self.env['version']
-        product.append(sap)
-        product.append(ver)
-        products.append(product)
+        for prod in params['products']:
+            product = ElementTree.Element('Product')
+            sap = ElementTree.Element('sapCode')
+            sap.text = prod['sap_code']
+            ver = ElementTree.Element('version')
+            ver.text = prod['version']
+            product.append(sap)
+            product.append(ver)
+            products.append(product)
         pkg_elem.append(products)
 
         # serial
-        if self.env.get('serial_number'):
+        if params.get('serial_number'):
             self.output('Adding serial number to ccp_automation xml')
             serial = ElementTree.Element('serialNumber')
-            serial.text = self.env['serial_number']
+            serial.text = params['serial_number']
             pkg_elem.append(serial)
 
         pkg_elem.append(lang)
@@ -284,8 +251,8 @@ class CreativeCloudPackager(Processor):
         # run it through `xmllint --format` just to save it pretty :/
         xml_string = ElementTree.tostring(xml_root, encoding='utf8', method='xml')
         proc = subprocess.Popen(['/usr/bin/xmllint', '--format', '-'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE)
         out, err = proc.communicate(xml_string)
         if proc.returncode:
             raise ProcessorError("Unexpected error from running XML output through "
@@ -314,6 +281,7 @@ class CreativeCloudPackager(Processor):
                  "use with 'enterprise' customer types."))
 
     def main(self):
+        # TODO: check and fail immediately if CCP is already running
         # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
         self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
@@ -321,29 +289,31 @@ class CreativeCloudPackager(Processor):
                                                         "Build/%s_Uninstall.pkg" % self.env["package_name"])
 
         saved_automation_xml_path = os.path.join(expected_output_root,
-                                                  'ccp_automation_input.xml')
-
+                                                 '.ccp_automation_input.xml')
+        automation_manifest_plist_path = os.path.join(expected_output_root,
+                                                      '.autopkg_manifest.plist')
         self.set_customer_type()
         # Handle any pre-existing package at the expected location, and end early if it matches our
         # input manifest
-        # TODO: for now we just continue on if the automation xml file already exists
-        if os.path.exists(saved_automation_xml_path):
-            existing_ccp_automation = self.automation_manifest_from_xml(saved_automation_xml_path)
-            print existing_ccp_automation
-            new_ccp_automation = self.automation_manifest_from_env()
-            print new_ccp_automation
-            print "EXITING EARLY!"
-            exit()
-            self.output("Naively returning early because we seem to already have a built package.")
-            return
+        if os.path.exists(automation_manifest_plist_path):
+            existing_manifest = FoundationPlist.readPlist(automation_manifest_plist_path)
+            new_manifest = self.automation_manifest_from_env(scrub_serial=True)
+            self.output("Found existing CCP package build automation info, comparing")
+            self.output("existing build: %s" % existing_manifest)
+            self.output("current build: %s" % new_manifest)
+            if new_manifest == existing_manifest:
+                self.output("Returning early because we have an existing package "
+                            "with the same parameters.")
+                return
 
+        # Going forward with building, set up or clear needed directories
+        xml_workdir = os.path.join(self.env["RECIPE_CACHE_DIR"], 'automation_xml')
+        if not os.path.exists(xml_workdir):
+            os.mkdir(xml_workdir)
+        if os.path.isdir(expected_output_root):
+            shutil.rmtree(expected_output_root)
 
         xml_data = self.automation_xml()
-        xml_workdir = os.path.join(self.env["RECIPE_CACHE_DIR"], 'automation_xml')
-        if os.path.exists(xml_workdir):
-            shutil.rmtree(xml_workdir)
-        os.mkdir(xml_workdir)
-
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
         xml_path = os.path.join(xml_workdir, 'ccp_automation_%s.xml' % self.env['NAME'])
@@ -398,7 +368,13 @@ class CreativeCloudPackager(Processor):
                 "CCP exited successfully, but no expected installer package "
                 "at %s exists." % self.env["pkg_path"])
 
+        # Save both the automation XML for posterity and our manifest plist for
+        # later comparison
         shutil.copy(xml_path, saved_automation_xml_path)
+        # TODO: we aren't scrubbing the automation XML file at all
+        FoundationPlist.writePlist(
+            self.automation_manifest_from_env(scrub_serial=True),
+            automation_manifest_plist_path)
 
         # Save PackageInfo.txt
         packageinfo = os.path.join(expected_output_root, "PackageInfo.txt")
