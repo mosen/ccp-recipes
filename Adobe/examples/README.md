@@ -12,8 +12,8 @@ supplying the required `ORG_NAME` variable on the command line eg:
 
 ## Currently Failing ##
 
-- Edge Code
 - Experience Design
-- Lightroom minor version will be incorrect due to patches not detected.
+- Lightroom minor version will be incorrect due to patches not detected (RIBS).
 - Preview CC never creates an Uninstall pkg
+- Gaming SDK version does not include x.x.y version
 
