@@ -40,10 +40,6 @@
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>
             <string>PolicyTemplate.xml</string>
-            <key>SELF_SERVICE_DESCRIPTION</key>
-            <string></string>
-            <key>SELF_SERVICE_ICON</key>
-            <string></string>
         </dict>
         <key>ParentRecipe</key>
         <string>com.github.mosen.jss.Adobe.CreativeCloudApp</string>

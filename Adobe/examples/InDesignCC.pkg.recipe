@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>Identifier</key>
-	<string>local.pkg.Adobe.InDesignCC</string>
-	<key>Input</key>
-	<dict>
-		<key>ADMIN_PRIVILEGES_ENABLED</key>
-		<false/>
-		<key>APPS_PANEL_ENABLED</key>
-		<false/>
-		<key>INCLUDE_UPDATES</key>
-		<true/>
-		<key>LICENSE_TYPE</key>
-		<string>team</string>
-		<key>NAME</key>
-		<string>AdobeInDesignCC</string>
-		<key>ORG_NAME</key>
-		<string>ADMIN_PLEASE_CHANGE</string>
-		<key>PRODUCT_ID</key>
-		<string>IDSN</string>
-		<key>RUM_ENABLED</key>
-		<true/>
-		<key>UPDATES_ENABLED</key>
-		<false/>
-		<key>VERSION</key>
-		<string>latest</string>
-	</dict>
-	<key>ParentRecipe</key>
-	<string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
-</dict>
+    <dict>
+        <key>Identifier</key>
+        <string>local.pkg.Adobe.InDesignCC</string>
+        <key>Input</key>
+        <dict>
+            <key>ADMIN_PRIVILEGES_ENABLED</key>
+            <false/>
+            <key>APPS_PANEL_ENABLED</key>
+            <false/>
+            <key>INCLUDE_UPDATES</key>
+            <true/>
+            <key>LICENSE_TYPE</key>
+            <string>team</string>
+            <key>NAME</key>
+            <string>AdobeInDesignCC</string>
+            <key>ORG_NAME</key>
+            <string>ADMIN_PLEASE_CHANGE</string>
+            <key>PRODUCT_ID</key>
+            <string>IDSN</string>
+            <key>RUM_ENABLED</key>
+            <true/>
+            <key>UPDATES_ENABLED</key>
+            <false/>
+            <key>VERSION</key>
+            <string>latest</string>
+        </dict>
+        <key>ParentRecipe</key>
+        <string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
+    </dict>
 </plist>

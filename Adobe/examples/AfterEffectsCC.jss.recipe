@@ -8,7 +8,7 @@
         <dict>
             <!-- CreativeCloudApp -->
             <key>NAME</key>
-            <string>AfterEffectsCC</string>
+            <string>AdobeAfterEffectsCC</string>
             <key>ADMIN_PRIVILEGES_ENABLED</key>
             <false/>
             <key>APPS_PANEL_ENABLED</key>
@@ -39,8 +39,6 @@
             <string>%NAME%-update-smart</string>
             <key>GROUP_TEMPLATE</key>
             <string>SmartGroupTemplate.xml</string>
-            <key>NAME</key>
-            <string>Adobe After Effects CC</string>
             <key>POLICY_CATEGORY</key>
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>

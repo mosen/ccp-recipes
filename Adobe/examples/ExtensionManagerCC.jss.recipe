@@ -3,13 +3,12 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.munki.Adobe.ExtendscriptToolkit</string>
+        <string>local.jss.Adobe.ExtensionManagerCC</string>
         <key>Input</key>
         <dict>
+            <!-- CreativeCloudApp -->
             <key>NAME</key>
-            <string>AdobeExtendscriptToolkit</string>
-            <key>MUNKI_REPO_SUBDIR</key>
-            <string>apps/Adobe</string>
+            <string>AdobeExtensionManagerCC</string>
             <key>ADMIN_PRIVILEGES_ENABLED</key>
             <false/>
             <key>APPS_PANEL_ENABLED</key>
@@ -23,15 +22,31 @@
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
             <key>PRODUCT_ID</key>
-            <string>KETK</string>
+            <string>KEMN</string>
             <key>RUM_ENABLED</key>
             <true/>
             <key>UPDATES_ENABLED</key>
             <false/>
             <key>VERSION</key>
             <string>latest</string>
+            <key>fetch_description</key>
+            <true/>
+            <key>fetch_icon</key>
+            <true/>
+
+            <!-- JSSImporter -->
+            <key>CATEGORY</key>
+            <string>Utilities</string>
+            <key>GROUP_NAME</key>
+            <string>%NAME%-update-smart</string>
+            <key>GROUP_TEMPLATE</key>
+            <string>SmartGroupTemplate.xml</string>
+            <key>POLICY_CATEGORY</key>
+            <string>Testing</string>
+            <key>POLICY_TEMPLATE</key>
+            <string>PolicyTemplate.xml</string>
         </dict>
         <key>ParentRecipe</key>
-        <string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
+        <string>com.github.mosen.jss.Adobe.CreativeCloudApp</string>
     </dict>
 </plist>
