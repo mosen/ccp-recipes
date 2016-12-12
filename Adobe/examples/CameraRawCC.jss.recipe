@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Identifier</key>
+        <string>local.jss.Adobe.CameraRawCC</string>
+        <key>Input</key>
+        <dict>
+            <key>NAME</key>
+            <string>CameraRawCC</string>
+            <key>ADMIN_PRIVILEGES_ENABLED</key>
+            <false/>
+            <key>APPS_PANEL_ENABLED</key>
+            <false/>
+            <key>BASE_VERSION</key>
+            <string></string>
+            <key>INCLUDE_UPDATES</key>
+            <true/>
+            <key>LICENSE_TYPE</key>
+            <string>team</string>
+            <key>ORG_NAME</key>
+            <string>ADMIN_PLEASE_CHANGE</string>
+            <key>PRODUCT_ID</key>
+            <string>ACR</string>
+            <key>RUM_ENABLED</key>
+            <true/>
+            <key>UPDATES_ENABLED</key>
+            <false/>
+            <key>VERSION</key>
+            <string>latest</string>
+            <key>CATEGORY</key>
+            <string>Productivity</string>
+            <key>GROUP_NAME</key>
+            <string>%NAME%-update-smart</string>
+            <key>GROUP_TEMPLATE</key>
+            <string>CameraRawCCSmartGroupTemplate.xml</string>
+            <key>NAME</key>
+            <string>Adobe Camera Raw CC</string>
+            <key>POLICY_CATEGORY</key>
+            <string>Testing</string>
+            <key>POLICY_TEMPLATE</key>
+            <string>PolicyTemplate.xml</string>
+            <key>SELF_SERVICE_DESCRIPTION</key>
+            <string></string>
+            <key>SELF_SERVICE_ICON</key>
+            <string></string>
+
+            <key>extension_attributes</key>
+            <array>
+                <dict>
+                    <key>ext_attribute_path</key>
+                    <string>CameraRawCCExtensionAttribute.xml</string>
+                </dict>
+            </array>
+        </dict>
+        <key>MinimumVersion</key>
+        <string>0.4.0</string>
+        <key>ParentRecipe</key>
+        <string>com.github.mosen.jss.Adobe.CreativeCloudApp</string>
+    </dict>
+</plist>
