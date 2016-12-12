@@ -3,12 +3,12 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.jss.Adobe.CameraRawCC</string>
+        <string>local.jss.Adobe.BridgeCC</string>
         <key>Input</key>
         <dict>
             <!-- CreativeCloudApp -->
             <key>NAME</key>
-            <string>CameraRawCC</string>
+            <string>BridgeCC</string>
             <key>ADMIN_PRIVILEGES_ENABLED</key>
             <false/>
             <key>APPS_PANEL_ENABLED</key>
@@ -22,7 +22,7 @@
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
             <key>PRODUCT_ID</key>
-            <string>ACR</string>
+            <string>KBRG</string>
             <key>RUM_ENABLED</key>
             <true/>
             <key>UPDATES_ENABLED</key>
@@ -31,6 +31,8 @@
             <string>latest</string>
             <key>fetch_description</key>
             <true/>
+            <key>fetch_icon</key>
+            <true/>
 
             <!-- JSSImporter -->
             <key>CATEGORY</key>
@@ -38,25 +40,13 @@
             <key>GROUP_NAME</key>
             <string>%NAME%-update-smart</string>
             <key>GROUP_TEMPLATE</key>
-            <string>CameraRawCCSmartGroupTemplate.xml</string>
+            <string>SmartGroupTemplate.xml</string>
             <key>NAME</key>
-            <string>Adobe Camera Raw CC</string>
+            <string>Adobe Bridge CC</string>
             <key>POLICY_CATEGORY</key>
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>
             <string>PolicyTemplate.xml</string>
-            <key>SELF_SERVICE_DESCRIPTION</key>
-            <string></string>
-            <key>SELF_SERVICE_ICON</key>
-            <string></string>
-
-            <key>extension_attributes</key>
-            <array>
-                <dict>
-                    <key>ext_attribute_path</key>
-                    <string>CameraRawCCExtensionAttribute.xml</string>
-                </dict>
-            </array>
         </dict>
         <key>ParentRecipe</key>
         <string>com.github.mosen.jss.Adobe.CreativeCloudApp</string>

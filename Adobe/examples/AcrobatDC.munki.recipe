@@ -33,8 +33,6 @@
 		<key>parse_proxy_xml</key>
 		<true/>
 	</dict>
-	<key>MinimumVersion</key>
-	<string>0.4.0</string>
 	<key>ParentRecipe</key>
 	<string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
 </dict>

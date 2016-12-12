@@ -8,71 +8,32 @@
     <string>local.munki.Adobe.PhotoshopCC</string>
     <key>Input</key>
     <dict>
-		<key>NAME</key>
-		<string>AdobePhotoshopCC</string>
-		<key>MUNKI_REPO_SUBDIR</key>
-		<string>apps/Adobe</string>
+        <key>NAME</key>
+        <string>AdobePhotoshopCC</string>
+        <key>MUNKI_REPO_SUBDIR</key>
+        <string>apps/Adobe</string>
+        <key>ADMIN_PRIVILEGES_ENABLED</key>
+        <false/>
+        <key>APPS_PANEL_ENABLED</key>
+        <false/>
+        <key>BASE_VERSION</key>
+        <string></string>
+        <key>INCLUDE_UPDATES</key>
+        <true/>
+        <key>LICENSE_TYPE</key>
+        <string>team</string>
+        <key>ORG_NAME</key>
+        <string>ADMIN_PLEASE_CHANGE</string>
+        <key>PRODUCT_ID</key>
+        <string>PHSP</string>
+        <key>RUM_ENABLED</key>
+        <true/>
+        <key>UPDATES_ENABLED</key>
+        <false/>
+        <key>VERSION</key>
+        <string>latest</string>
     </dict>
-    <key>MinimumVersion</key>
-    <string>0.4.0</string>
 	<key>ParentRecipe</key>
-	<string>local.pkg.Adobe.PhotoshopCC</string>
-    <key>Process</key>
-    <array>
-		<!-- Build the installer DMG for Munki containing the entire Build directory,
-	    so that items like the .ccp file persists with the installer. This may be
-		useful for auditing purposes later. -->
-        <dict>
-            <key>Processor</key>
-            <string>DmgCreator</string>
-            <key>Arguments</key>
-            <dict>
-                <key>dmg_root</key>
-                <string>%RECIPE_CACHE_DIR%/%NAME%</string>
-                <key>dmg_path</key>
-                <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.dmg</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Processor</key>
-            <string>DmgCreator</string>
-            <key>Arguments</key>
-            <dict>
-                <key>dmg_root</key>
-                <string>%uninstaller_pkg_path%</string>
-                <key>dmg_path</key>
-                <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.dmg</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>Arguments</key>
-            <dict>
-                <key>additional_pkginfo</key>
-                <dict>
-                    <key>minimum_os_version</key>
-                    <string>%minimum_os_version%</string>
-                </dict>
-            </dict>
-            <key>Processor</key>
-            <string>MunkiPkginfoMerger</string>
-        </dict>
-        <dict>
-            <key>Arguments</key>
-            <dict>
-				<!-- TODO: MunkiImporter doesn't currently handle copying uninstaller pkgs -->
-                <key>additional_makepkginfo_options</key>
-                <array>
-                    <string>--uninstallpkg</string>
-                    <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.dmg</string>
-                </array>
-                <key>pkg_path</key>
-                <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.dmg</string>
-                <key>repo_subdirectory</key>
-                <string>%MUNKI_REPO_SUBDIR%</string>
-            </dict>
-            <key>Processor</key>
-            <string>MunkiImporter</string>
-        </dict>
-    </array>
+	<string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
 </dict>
 </plist>

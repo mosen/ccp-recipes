@@ -36,8 +36,6 @@
             <string>%NAME%-update-smart</string>
             <key>GROUP_TEMPLATE</key>
             <string>AcrobatDCSmartGroupTemplate.xml</string>
-            <key>NAME</key>
-            <string>Adobe Acrobat DC</string>
             <key>POLICY_CATEGORY</key>
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>
@@ -47,8 +45,6 @@
             <key>SELF_SERVICE_ICON</key>
             <string></string>
         </dict>
-        <key>MinimumVersion</key>
-        <string>0.4.0</string>
         <key>ParentRecipe</key>
         <string>com.github.mosen.jss.Adobe.CreativeCloudApp</string>
     </dict>

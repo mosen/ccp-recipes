@@ -15,15 +15,13 @@
             <key>GROUP_TEMPLATE</key>
             <string>SmartGroupTemplate.xml</string>
             <key>NAME</key>
-            <string>CreativeCloudApp</string>
+            <string>%display_name%</string>
             <key>POLICY_CATEGORY</key>
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>
             <string>PolicyTemplate.xml</string>
-            <key>SELF_SERVICE_DESCRIPTION</key>
-            <string>%display_name%</string>
             <key>SELF_SERVICE_ICON</key>
-            <string>CC.png</string>
+            <string></string>
         </dict>
         <key>MinimumVersion</key>
         <string>1.0.0</string>
@@ -47,6 +45,8 @@
                             <string>%GROUP_TEMPLATE%</string>
                         </dict>
                     </array>
+                    <key>package_notes</key>
+                    <string>%package_info_text%</string>
                     <key>policy_category</key>
                     <string>%POLICY_CATEGORY%</string>
                     <key>policy_template</key>
@@ -54,9 +54,9 @@
                     <key>prod_name</key>
                     <string>%NAME%</string>
                     <key>self_service_description</key>
-                    <string>%SELF_SERVICE_DESCRIPTION%</string>
+                    <string>%release_notes%</string>
                     <key>self_service_icon</key>
-                    <string>%SELF_SERVICE_ICON%</string>
+                    <string>%icon_path%</string>
                 </dict>
                 <key>Processor</key>
                 <string>JSSImporter</string>

@@ -19,6 +19,7 @@ import sys
 import string
 import json
 import urllib2
+from tempfile import mkdtemp
 from urllib import urlencode
 from distutils.version import LooseVersion as LV
 from xml.etree import ElementTree
@@ -33,7 +34,7 @@ __all__ = ["CreativeCloudFeed"]
 AAMEE_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/aamee/v2/products/all'
 BASE_URL = 'https://prod-rel-ffc-ccm.oobesaas.adobe.com/adobe-ffc-external/core/v4/products/all'
 CDN_SECURE_URL = 'https://ccmdls.adobe.com'
-UPDATE_DESC_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/core/v1/update/description?name={sapcode}&version={version}&platform={platform}&language={language}'
+UPDATE_DESC_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/core/v1/update/description'
 UPDATE_FEED_URL_MAC = 'https://swupmf.adobe.com/webfeed/oobe/aam20/mac/updaterfeed.xml'
 HEADERS = {'User-Agent': 'Creative Cloud', 'x-adobe-app-id': 'AUSST_4_0'}
 
@@ -71,6 +72,16 @@ class CreativeCloudFeed(Processor):
             "required": False,
             "default": False,
             "description": "Fetch and parse the product proxy XML"
+        },
+        "fetch_release_notes": {
+            "required": False,
+            "default": False,
+            "description": "Fetch the update release notes in the current language"
+        },
+        "fetch_icon": {
+            "required": False,
+            "default": False,
+            "description": "Fetch the product icon to the cache directory"
         }
     }
 
@@ -98,6 +109,12 @@ class CreativeCloudFeed(Processor):
         },
         "minimum_os_version": {
             "description": "The minimum operating system version required to install this package"
+        },
+        "release_notes": {
+            "description": "The update release notes if fetch_release_notes was true, otherwise empty string"
+        },
+        "icon_path": {
+            "description": "Path to the downloaded icon, if fetch_icon was true."
         }
     }
 
@@ -115,6 +132,17 @@ class CreativeCloudFeed(Processor):
             params.append(('platform', pl))
 
         return BASE_URL + '?' + urlencode(params)
+
+    def desc_url(self, sapcode, version, platform, language):
+        """Build the query for fetching an update description"""
+        params = [
+            ('name', sapcode),
+            ('version', version),
+            ('platform', platform),
+            ('language', language)
+        ]
+
+        return UPDATE_DESC_URL + '?' + urlencode(params)
 
     def fetch_proxy_data(self, proxy_data_url):
         """Fetch the proxy data to get additional information about the product."""
@@ -147,6 +175,25 @@ class CreativeCloudFeed(Processor):
             raise ProcessorError('Could not find proxy data URL in manifest, aborting since your package requires it.')
 
         self.fetch_proxy_data(proxy_data_url_el.text)
+
+    def fetch_release_notes(self, sapcode, version, platform, language):
+        """Fetch the update description (release notes).
+
+        This returns with an xml response in the form::
+            <UpdateDescriptionResponse>
+                <Language>en_US</Language>
+                <UpdateDescription>...</UpdateDescription>
+            </UpdateDescriptionResponse>
+
+        It usually contains the specific bugs and features introduced in this version, not a general overview of the
+        product.
+        """
+        url = self.desc_url(sapcode, version, platform, language)
+        self.output('Fetching release notes from: {}'.format(url))
+        req = urllib2.Request(url, headers=HEADERS)
+        raw_data = urllib2.urlopen(req).read()
+
+        return raw_data
 
     def fetch(self, channels, platforms):
         """Download the main feed"""
@@ -236,6 +283,19 @@ class CreativeCloudFeed(Processor):
         else:
             self.output('Did not find a manifest.xml in the product json data')
 
+        if self.env.get('fetch_release_notes', False):
+            self.output('Processor will fetch update release notes')
+            desc = self.fetch_release_notes(product_id, product['version'], 'osx10-64', 'en_US')
+            rn_etree = ElementTree.fromstring(desc)
+            release_notes_el = rn_etree.find('UpdateDescription')
+
+            if release_notes_el is None:
+                raise ProcessorError('Could not find UpdateDescription in release notes')
+
+            self.env['release_notes'] = release_notes_el.text
+        else:
+            self.env['release_notes'] = ''
+
         # output variable naming has been kept as close to pkginfo names as possible in order to feed munkiimport
         self.env['product_info_url'] = product.get('productInfoPage')
         self.env['version'] = product.get('version')
@@ -246,6 +306,16 @@ class CreativeCloudFeed(Processor):
                 if icon.get('size') == '96x96':
                     self.env['icon_url'] = icon.get('value')
                     break
+
+        if self.env['icon_url'] is not None and self.env.get('fetch_icon', False):
+            self.output('Fetching icon from {}'.format(self.env['icon_url']))
+            req = urllib2.Request(self.env['icon_url'], headers=HEADERS)
+            content = urllib2.urlopen(req).read()
+
+            with open('{}/Icon.png'.format(self.env['RECIPE_CACHE_DIR']), 'w+') as fd:
+                fd.write(content)
+
+            self.env['icon_path'] = '{}/Icon.png'.format(self.env['RECIPE_CACHE_DIR'])
 
 
 if __name__ == "__main__":
