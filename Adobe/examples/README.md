@@ -16,7 +16,7 @@ supplying the required `ORG_NAME` variable on the command line eg:
 - Lightroom minor version will be incorrect due to patches not detected (RIBS).
 - Preview CC never creates an Uninstall pkg
 - Gaming SDK version does not include x.x.y version
-
+- Extension Manager CC does not include x.x.y version
 
 ### JSS ###
 
@@ -25,5 +25,6 @@ supplying the required `ORG_NAME` variable on the command line eg:
 - Camera Raw Version Smart Group does not match EA version.
 - Acrobat DC Smart Group Version does not match Installed Application version.
 - Version string comparison might end up scoping computers for a downgrade if two package smartgroups exist.
+- Error in local.jss.Adobe.IllustratorCC: Processor: JSSImporter: Error: Central directory offset would require ZIP64 extensions
 
 

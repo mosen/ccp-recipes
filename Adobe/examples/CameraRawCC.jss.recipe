@@ -31,6 +31,8 @@
             <string>latest</string>
             <key>fetch_description</key>
             <true/>
+            <key>parse_proxy_xml</key>
+            <true/>
 
             <!-- JSSImporter -->
             <key>CATEGORY</key>

@@ -21,7 +21,7 @@
             <priority>2</priority>
             <and_or>and</and_or>
             <search_type>is not</search_type>
-            <value>%VERSION%</value>
+            <value>%proxy_version%</value>
         </criterion>
         <criterion>
             <name>Computer Group</name>

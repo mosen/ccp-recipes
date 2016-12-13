@@ -71,7 +71,7 @@ class CreativeCloudFeed(Processor):
         "parse_proxy_xml": {
             "required": False,
             "default": False,
-            "description": "Fetch and parse the product proxy XML"
+            "description": "Fetch and parse the product proxy XML which will set proxy_version in the output"
         },
         "fetch_release_notes": {
             "required": False,
@@ -115,6 +115,9 @@ class CreativeCloudFeed(Processor):
         },
         "icon_path": {
             "description": "Path to the downloaded icon, if fetch_icon was true."
+        },
+        "proxy_version": {
+            "description": "The product version listed in the proxy file, which usually has more digits"
         }
     }
 
@@ -151,15 +154,14 @@ class CreativeCloudFeed(Processor):
         content = urllib2.urlopen(req).read()
 
         proxy_data = ElementTree.fromstring(content)
-        product_version_el = proxy_data.find('InstallerProperties/Property[@name="ProductVersion"]')
-        if product_version_el is None:
-            raise ProcessorError('Could not find ProductVersion in proxy data, aborting.')
-
-        self.env['version'] = product_version_el.text
+        return proxy_data
 
     def fetch_manifest(self, manifest_url):
         """Fetch the manifest.xml at manifest_url which contains asset download and proxy data information.
-        Not all products have a proxy_data element"""
+        Not all products have a proxy_data element
+
+        :returns A tuple of (manifest, proxy) ElementTree objects
+        """
         self.output('Fetching manifest.xml from {}'.format(manifest_url))
         req = urllib2.Request(manifest_url, headers=HEADERS)
         content = urllib2.urlopen(req).read()
@@ -174,7 +176,9 @@ class CreativeCloudFeed(Processor):
         if proxy_data_url_el is None:
             raise ProcessorError('Could not find proxy data URL in manifest, aborting since your package requires it.')
 
-        self.fetch_proxy_data(proxy_data_url_el.text)
+        proxy_data = self.fetch_proxy_data(proxy_data_url_el.text)
+
+        return manifest, proxy_data
 
     def fetch_release_notes(self, sapcode, version, platform, language):
         """Fetch the update description (release notes).
@@ -271,7 +275,7 @@ class CreativeCloudFeed(Processor):
             # hacky workaround to avoid packager bailing when there is no minimum os version
             self.env['minimum_os_version'] = ''
 
-        if 'urls' in first_platform['languageSet'][0]:
+        if 'urls' in first_platform['languageSet'][0] and 'manifestURL' in first_platform['languageSet'][0]['urls']:
             self.env['manifest_url'] = '{}{}'.format(
                 channel_cdn['ccm']['secure'],
                 first_platform['languageSet'][0]['urls'].get('manifestURL')
@@ -279,7 +283,15 @@ class CreativeCloudFeed(Processor):
 
             if self.env.get('parse_proxy_xml', False):
                 self.output('Processor will fetch manifest and proxy xml')
-                self.fetch_manifest(self.env['manifest_url'])
+                manifest, proxy = self.fetch_manifest(self.env['manifest_url'])
+                product_version_el = proxy.find('InstallerProperties/Property[@name="ProductVersion"]')
+                if product_version_el is None:
+                    raise ProcessorError('Could not find ProductVersion in proxy data, aborting.')
+                else:
+                    self.output('Found version in proxy.xml: {}'.format(product_version_el.text))
+                    self.env['proxy_version'] = product_version_el.text
+            else:
+                self.env['proxy_version'] = ''
         else:
             self.output('Did not find a manifest.xml in the product json data')
 
@@ -316,7 +328,8 @@ class CreativeCloudFeed(Processor):
                 fd.write(content)
 
             self.env['icon_path'] = '{}/Icon.png'.format(self.env['RECIPE_CACHE_DIR'])
-
+        else:
+            self.env['icon_path'] = ''
 
 if __name__ == "__main__":
     processor = CreativeCloudFeed()

@@ -31,6 +31,8 @@
             <string>latest</string>
             <key>fetch_description</key>
             <true/>
+            <key>fetch_icon</key>
+            <true/>
 
             <!-- JSSImporter -->
             <key>CATEGORY</key>
@@ -43,8 +45,6 @@
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>
             <string>PolicyTemplate.xml</string>
-            <key>SELF_SERVICE_ICON</key>
-            <string></string>
         </dict>
         <key>ParentRecipe</key>
         <string>com.github.mosen.jss.Adobe.CreativeCloudApp</string>
