@@ -174,21 +174,25 @@ class CreativeCloudPackager(Processor):
         # copy all defined params for this processor into a top-level dict
         for param in self.input_variables.keys():
             if param in self.env.keys():
+                # skip any parameters that are defined but empty strings,
+                # like serial_number or device_pool_name.
+                # CCP automation will pick a different package type depending on
+                # whether these elements exist or not, so we need to be careful
+                # to not copy a serial or device pool setting to the XML being
+                # fed to CCP, even if it's an empty string.
+                if self.env[param] == '':
+                    continue
                 manifest[param] = self.env[param]
+
         manifest['products'] = []
         manifest['products'].append({
             'sap_code': self.env['product_id'],
             'version': self.env['version'],
         })
         manifest['language'] = self.env['language']
-        if self.env.get('serial_number'):
-            manifest['serial_number'] = self.env['serial_number']
-            if scrub_serial:
-                manifest['serial_number'] = 'REDACTED'
-        else:
-            # just remove serial_number from altogether if it was empty, to
-            # avoid confusion
-            manifest.pop('serial_number', None)
+
+        if manifest.get('serial_number') and scrub_serial:
+            manifest['serial_number'] = 'REDACTED'
         return manifest
 
     def automation_xml(self):
