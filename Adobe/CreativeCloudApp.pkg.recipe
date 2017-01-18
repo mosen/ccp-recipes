@@ -51,8 +51,10 @@ Other Input values here correspond to options provided in the CCP UI.</string>
             <false/>
             <key>ADMIN_PRIVILEGES_ENABLED</key>
             <false/>
-			<key>SERIAL_NUMBER</key>
-			<string></string>
+            <key>SERIAL_NUMBER</key>
+            <string></string>
+            <key>DEPLOYMENT_POOL</key>
+            <string></string>
         </dict>
         <key>MinimumVersion</key>
         <string>0.4.0</string>
@@ -92,8 +94,10 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                     <false/>
                     <key>admin_privileges_enabled</key>
                     <false/>
-					<key>serial_number</key>
-					<string>%SERIAL_NUMBER%</string>
+                    <key>serial_number</key>
+                    <string>%SERIAL_NUMBER%</string>
+                    <key>device_pool_name</key>
+                    <string>%DEPLOYMENT_POOL%</string>
                 </dict>
             </dict>
             <dict>

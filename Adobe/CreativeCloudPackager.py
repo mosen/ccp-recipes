@@ -98,6 +98,11 @@ class CreativeCloudPackager(Processor):
             "required": False,
             "description": "The serial number, if you are using serialized packages.",
         },
+        "device_pool_name": {
+            "required": False,
+            "description": ("The 'Deployment Pool', if building a Teams Device "
+                            "License package is desired."),
+        },
         "include_updates": {
             "required": False,
             "default": True,
