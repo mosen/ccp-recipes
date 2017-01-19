@@ -297,6 +297,11 @@ class CreativeCloudPackager(Processor):
                 ("Serial number was given, but serial numbers are only for "
                  "use with 'enterprise' customer types."))
 
+    def is_ccp_running(self):
+        """Determine whether CCP is already running. This would prevent us from actually running the automation XML."""
+        status = subprocess.call(['pgrep', 'PDApp'])
+        return status == 0
+
     def main(self):
         # TODO: check and fail immediately if CCP is already running
         # establish some of our expected build paths
@@ -336,6 +341,12 @@ class CreativeCloudPackager(Processor):
         xml_path = os.path.join(xml_workdir, 'ccp_automation_%s.xml' % self.env['NAME'])
         with open(xml_path, 'w') as fd:
             fd.write(xml_data)
+
+        if self.is_ccp_running():
+            raise ProcessorError(
+                "You cannot start a Creative Cloud Packager automation workflow " +
+                "if Creative Cloud Packager is already running. Please quit CCP and start this recipe again."
+            )
 
         cmd = [
             '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
