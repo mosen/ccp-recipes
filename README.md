@@ -23,7 +23,7 @@ As an example, we will be creating an override recipe for Photoshop CC 2017.
 
 In Terminal, run:
 
-    autopkg make-override -n PhotoshopCC2017 CreativeCloudApp.pkg.recipe
+    autopkg make-override -n PhotoshopCC2017.pkg CreativeCloudApp.pkg.recipe
 
 AutoPkg will create an override file in your RecipeOverrides folder. Edit the resulting file with a text editor of your choice.
 
@@ -121,7 +121,7 @@ Takes information about package(s) and your license information, and builds a pa
     - **required:** True
     - **description:** The name of the output package. CCP will add `_Install` and `_Uninstall` suffixes.
 
-- **customer_type:**
+- **license_type:**
     - **default:** (Taken from your CCP Preferences for the most recent login)
     - **required:** False
     - **description:** The license type, one of: `enterprise`, `team`. If this is omitted, CCP's preferences for
@@ -135,7 +135,7 @@ Takes information about package(s) and your license information, and builds a pa
 - **serial_number:**
     - **default:** (None)
     - **required:** False
-    - **description:** The serial number, if you are using serialized packages.
+    - **description:** The serial number, if you are using serialized packages.  The serial number should expressed without punctuation, rather than the hyphenated format provided by Adobe (i.e. instead of `1111-2222-3333-4444-5555-6666`, use `111122223333444455556666`).
 
 - **language:**
     - **default:** `en_US`
@@ -145,7 +145,7 @@ Takes information about package(s) and your license information, and builds a pa
 - **include_updates:**
     - **default:** True
     - **required:** False
-    - **description:** Include all available updates to the package(s) specified.
+    - **description:** Include all available ride-along updates (such as Camera RAW) to the package(s) specified.
 
 - **rum_enabled:**
     - **default:** True
