@@ -3,11 +3,11 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.pkg.Adobe.BridgeCC</string>
+        <string>local.pkg.Adobe.CreativeCloud</string>
         <key>Input</key>
         <dict>
             <key>NAME</key>
-            <string>AdobeBridgeCC</string>
+            <string>AdobeCreativeCloud</string>
             <key>ADMIN_PRIVILEGES_ENABLED</key>
             <false/>
             <key>APPS_PANEL_ENABLED</key>
@@ -21,7 +21,7 @@
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
             <key>PRODUCT_ID</key>
-            <string>KBRG</string>
+            <string>KCCC</string>
             <key>RUM_ENABLED</key>
             <true/>
             <key>UPDATES_ENABLED</key>
