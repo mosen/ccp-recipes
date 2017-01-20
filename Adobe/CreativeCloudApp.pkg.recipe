@@ -75,6 +75,10 @@ Other Input values here correspond to options provided in the CCP UI.</string>
             </dict>
             <dict>
                 <key>Processor</key>
+                <string>EndOfCheckPhase</string>
+            </dict>
+            <dict>
+                <key>Processor</key>
                 <string>CreativeCloudPackager</string>
                 <key>Arguments</key>
                 <dict>
@@ -99,10 +103,6 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                     <key>device_pool_name</key>
                     <string>%DEPLOYMENT_POOL%</string>
                 </dict>
-            </dict>
-            <dict>
-                <key>Processor</key>
-                <string>EndOfCheckPhase</string>
             </dict>
         </array>
     </dict>
