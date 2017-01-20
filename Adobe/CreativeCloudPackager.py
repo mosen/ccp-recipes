@@ -310,7 +310,7 @@ class CreativeCloudPackager(Processor):
 
     def is_ccp_running(self):
         """Determine whether CCP is already running. This would prevent us from actually running the automation XML."""
-        status = subprocess.call(['pgrep', 'PDApp'])
+        status = subprocess.call(['/usr/bin/pgrep', '-q', 'PDApp'])
         return status == 0
 
     def main(self):
