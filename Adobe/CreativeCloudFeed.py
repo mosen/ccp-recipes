@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import sys
+import os.path
 import string
 import json
 import urllib2
@@ -81,6 +82,11 @@ class CreativeCloudFeed(Processor):
             "required": False,
             "default": False,
             "description": "Fetch the product icon to the cache directory"
+        },
+        "write_product_json": {
+            "required": False,
+            "default": True,
+            "description": "Write a product.json file to the cache directory from the selected product fragment"
         }
     }
 
@@ -262,6 +268,23 @@ class CreativeCloudFeed(Processor):
             raise ProcessorError('This process does not support RIBS style packages.')
 
         self.output('Found matching product {}, version: {}'.format(product.get('displayName'), product.get('version')))
+
+        self.env['download_changed'] = True
+        # Check against last result if available
+        if os.path.exists('{}/product.json'.format(self.env['RECIPE_CACHE_DIR'])):
+            with open('{}/product.json'.format(self.env['RECIPE_CACHE_DIR']), 'w+') as fd:
+                content = fd.read()
+                data = json.loads(content)
+                if data.get('version', '') == product.get('version'):
+                    self.output('The feed version matches the last fetched version, no download is required')
+                    self.env['download_changed'] = False
+                else:
+                    self.output('The feed version has changed from the last fetch, download is required')
+
+        # Feed processor uses this to detect whether there is a newer feed version.
+        if self.env.get('write_product_json', True):
+            with open('{}/product.json'.format(self.env['RECIPE_CACHE_DIR']), 'w+') as fd:
+                fd.write(json.dumps(product))
 
         if len(first_platform['systemCompatibility']['operatingSystem']['range']) > 0:
             compatibility_range = first_platform['systemCompatibility']['operatingSystem']['range'][0]
