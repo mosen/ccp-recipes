@@ -10,6 +10,8 @@
             <false/>
             <key>APPS_PANEL_ENABLED</key>
             <false/>
+            <key>BASE_VERSION</key>
+            <string></string>
             <key>INCLUDE_UPDATES</key>
             <true/>
             <key>LICENSE_TYPE</key>

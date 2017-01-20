@@ -131,7 +131,18 @@ class CreativeCloudPackager(Processor):
         "admin_privileges_enabled": {
             "required": False,
             "default": False,
-            "description": "Allow the desktop application to run in privileged mode, so that standard users may install apps.",
+            "description": (
+                "Allow the desktop application to run in privileged mode,"
+                "so that standard users may install apps."
+            )
+        },
+        "download_changed": {
+            "required": False,
+            "description": (
+                "download_changed is set by the CreativeCloudFeed processor to "
+                "indicate that a new product is available. If this key is set "
+                "in the environment and is False or empty the package workflow "
+                "will be skipped.")
         },
     }
 
@@ -303,6 +314,10 @@ class CreativeCloudPackager(Processor):
         return status == 0
 
     def main(self):
+        if 'download_changed' in self.env and not self.env['download_changed']:
+            self.output("Skipping CCP build: version has not changed.")
+            return
+        
         # TODO: check and fail immediately if CCP is already running
         # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])

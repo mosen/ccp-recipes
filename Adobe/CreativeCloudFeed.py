@@ -272,7 +272,7 @@ class CreativeCloudFeed(Processor):
         self.env['download_changed'] = True
         # Check against last result if available
         if os.path.exists('{}/product.json'.format(self.env['RECIPE_CACHE_DIR'])):
-            with open('{}/product.json'.format(self.env['RECIPE_CACHE_DIR']), 'w+') as fd:
+            with open('{}/product.json'.format(self.env['RECIPE_CACHE_DIR']), 'r') as fd:
                 content = fd.read()
                 data = json.loads(content)
                 if data.get('version', '') == product.get('version'):
