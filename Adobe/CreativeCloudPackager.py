@@ -318,7 +318,6 @@ class CreativeCloudPackager(Processor):
         #     self.output("Skipping CCP build: version has not changed.")
         #     return
         
-        # TODO: check and fail immediately if CCP is already running
         # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
         self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
