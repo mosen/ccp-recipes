@@ -314,9 +314,9 @@ class CreativeCloudPackager(Processor):
         return status == 0
 
     def main(self):
-        if 'download_changed' in self.env and not self.env['download_changed']:
-            self.output("Skipping CCP build: version has not changed.")
-            return
+        # if 'download_changed' in self.env and not self.env['download_changed']:
+        #     self.output("Skipping CCP build: version has not changed.")
+        #     return
         
         # TODO: check and fail immediately if CCP is already running
         # establish some of our expected build paths
