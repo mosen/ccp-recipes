@@ -44,9 +44,7 @@
                     </dict>
                 </array>
             </dict>
-
-            <key>parse_proxy_xml</key>
-            <true/>
+            
             <key>fetch_description</key>
             <true/>
             <key>fetch_icon</key>
