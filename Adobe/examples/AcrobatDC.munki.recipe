@@ -32,6 +32,22 @@
             <string>15.0</string>
             <key>parse_proxy_xml</key>
             <true/>
+            <key>pkginfo</key>
+            <dict>
+                <key>blocking_applications</key>
+                <array>
+                    <string>Adobe Acrobat</string>
+                    <string>Acrobat Distiller</string>
+                </array>
+                <key>catalogs</key>
+                <array>
+                    <string>testing</string>
+                </array>
+                <key>name</key>
+                <string>%NAME%</string>
+                <key>unattended_install</key>
+                <true/>
+            </dict>
         </dict>
         <key>ParentRecipe</key>
         <string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>

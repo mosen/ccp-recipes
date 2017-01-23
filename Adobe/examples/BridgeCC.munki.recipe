@@ -11,13 +11,13 @@
             <key>MUNKI_REPO_SUBDIR</key>
             <string>apps/Adobe</string>
             <key>ADMIN_PRIVILEGES_ENABLED</key>
-            <false/>
+            <string>false</string>
             <key>APPS_PANEL_ENABLED</key>
-            <false/>
+            <string>false</string>
             <key>BASE_VERSION</key>
             <string></string>
             <key>INCLUDE_UPDATES</key>
-            <true/>
+            <string>true</string>
             <key>LICENSE_TYPE</key>
             <string>team</string>
             <key>NAME</key>
@@ -27,11 +27,20 @@
             <key>PRODUCT_ID</key>
             <string>KBRG</string>
             <key>RUM_ENABLED</key>
-            <true/>
+            <string>true</string>
             <key>UPDATES_ENABLED</key>
-            <false/>
+            <string>false</string>
             <key>VERSION</key>
             <string>latest</string>
+            <key>pkginfo</key>
+            <dict>
+                <key>catalogs</key>
+                <array>
+                    <string>testing</string>
+                </array>
+                <key>name</key>
+                <string>%NAME%</string>
+            </dict>
         </dict>
         <key>ParentRecipe</key>
         <string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
