@@ -89,7 +89,7 @@ class CreativeCloudPackager(Processor):
                             "either the Enterprise Dashboard (upper right), or "
                             "by looking in Contents/Resources/optionXML.xml of "
                             "a previously-built package, in the "
-                            "OrganizationName element."),
+                            "OrganizationName element. This overrides the organizationName in ccpinfo"),
         }
     }
 
@@ -160,6 +160,10 @@ class CreativeCloudPackager(Processor):
             if isinstance(value, bool):
                 value = str(value).lower()
             elem.text = value
+
+            if param == 'organizationName' and self.env.get('organization_name'):
+                elem.text = self.env['organization_name']
+                
             pkg_elem.append(elem)
 
         # Products

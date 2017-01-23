@@ -28,26 +28,45 @@ Other Input values here correspond to options provided in the CCP UI.</string>
         <dict>
             <key>NAME</key>
             <string>CreativeCloudApp</string>
+            <key>ORG_NAME</key>
+            <string>ADMIN_PLEASE_CHANGE</string>
             <key>ccpinfo</key>
             <dict>
                 <!-- Boolean flags -->
+
+                <!-- Build a package using the language set in the operating system -->
                 <key>matchOSLanguage</key>
                 <true/>
+
+                <!-- Enable Remote Update Manager -->
                 <key>rumEnabled</key>
                 <true/>
+
+                <!-- Updates Enabled -->
                 <key>updatesEnabled</key>
                 <false/>
+
+                <!-- Users may install apps via the Apps panel -->
                 <key>appsPanelEnabled</key>
                 <true/>
+
+                <!-- CCDA will have admin privileges, allowing Standard users to install Apps -->
                 <key>adminPrivilegesEnabled</key>
                 <true/>
+
+                <!-- Include updates available for specified Product(s) -->
                 <key>IncludeUpdates</key>
                 <true/>
+
+                <!-- Use 64-bit platform, should always be true -->
                 <key>is64Bit</key>
                 <true/>
 
+                <!-- organizationName, may be overridden by ORG_NAME -->
                 <key>organizationName</key>
                 <string>ADMIN_PLEASE_CHANGE</string>
+
+                <!-- The customer license type: team or enterprise -->
                 <key>customerType</key>
                 <string>team</string>
                 <key>Language</key>
