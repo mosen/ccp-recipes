@@ -8,6 +8,8 @@
         <dict>
             <key>NAME</key>
             <string>AdobeBridgeCC</string>
+            <key>ORG_NAME</key>
+            <string>ADMIN_PLEASE_CHANGE</string>
             <key>ccpinfo</key>
             <dict>
                 <key>matchOSLanguage</key>

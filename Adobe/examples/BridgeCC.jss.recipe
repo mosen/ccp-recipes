@@ -6,29 +6,45 @@
         <string>local.jss.Adobe.BridgeCC</string>
         <key>Input</key>
         <dict>
-            <!-- CreativeCloudApp -->
             <key>NAME</key>
-            <string>BridgeCC</string>
-            <key>ADMIN_PRIVILEGES_ENABLED</key>
-            <false/>
-            <key>APPS_PANEL_ENABLED</key>
-            <false/>
-            <key>BASE_VERSION</key>
-            <string></string>
-            <key>INCLUDE_UPDATES</key>
-            <true/>
-            <key>LICENSE_TYPE</key>
-            <string>team</string>
+            <string>AdobeBridgeCC</string>
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
-            <key>PRODUCT_ID</key>
-            <string>KBRG</string>
-            <key>RUM_ENABLED</key>
-            <true/>
-            <key>UPDATES_ENABLED</key>
-            <false/>
-            <key>VERSION</key>
-            <string>latest</string>
+            <key>ccpinfo</key>
+            <dict>
+                <key>matchOSLanguage</key>
+                <true/>
+                <key>rumEnabled</key>
+                <true/>
+                <key>updatesEnabled</key>
+                <false/>
+                <key>appsPanelEnabled</key>
+                <true/>
+                <key>adminPrivilegesEnabled</key>
+                <true/>
+                <key>IncludeUpdates</key>
+                <true/>
+                <key>is64Bit</key>
+                <true/>
+                <key>organizationName</key>
+                <string>ADMIN_PLEASE_CHANGE</string>
+                <key>customerType</key>
+                <string>team</string>
+                <key>Language</key>
+                <string>en_US</string>
+                <key>Products</key>
+                <array>
+                    <dict>
+                        <key>sapCode</key>
+                        <string>KBRG</string>
+                        <key>baseVersion</key>
+                        <string></string>
+                        <key>version</key>
+                        <string>latest</string>
+                    </dict>
+                </array>
+            </dict>
+
             <key>fetch_description</key>
             <true/>
             <key>fetch_icon</key>
@@ -36,13 +52,11 @@
 
             <!-- JSSImporter -->
             <key>CATEGORY</key>
-            <string>Design</string>
+            <string></string>
             <key>GROUP_NAME</key>
             <string>%NAME%-update-smart</string>
             <key>GROUP_TEMPLATE</key>
             <string>SmartGroupTemplate.xml</string>
-            <key>NAME</key>
-            <string>Adobe Bridge CC</string>
             <key>POLICY_CATEGORY</key>
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>
