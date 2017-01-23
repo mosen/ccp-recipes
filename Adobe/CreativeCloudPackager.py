@@ -50,24 +50,6 @@ CCP_ERROR_MSGS = {
         ("Serial number validation failed."),
 }
 
-BOOLEANY_INPUTS = [
-    'include_updates',
-    'rum_enabled',
-    'updates_enabled',
-    'apps_panel_enabled',
-    'admin_privileges_enabled',
-    'match_os_language'
-]
-
-BOOLEANY_ELEMENT_MAP = {
-    'include_updates': 'IncludeUpdates',
-    'rum_enabled': 'rumEnabled',
-    'updates_enabled': 'updatesEnabled',
-    'apps_panel_enabled': 'appsPanelEnabled',
-    'admin_privileges_enabled': 'adminPrivilegesEnabled',
-    'match_os_language': 'matchOSLanguage',
-}
-
 # Note: TronWelcomeInputValidationError can also happen if  a file or folder
 # already exists at the package path given. Sample result output in that case:
 # <TronResult version="1.0">
@@ -87,18 +69,6 @@ BOOLEANY_ELEMENT_MAP = {
 # <errorMessage>productNotFound</errorMessage>
 # </error>
 # </TronResult>
-
-
-def truthy(v):
-    """Test not only for truthiness but for case-insensitive matching of string literal TRUE or FALSE"""
-    if v.lower() == 'true':
-        return True
-
-    if v.lower() == 'false':
-        return False
-
-    return bool(v)
-
 
 class CreativeCloudPackager(Processor):
     """Create and execute a CCP automation file. The package output will always be the autopkg cache directory"""
@@ -120,24 +90,7 @@ class CreativeCloudPackager(Processor):
                             "by looking in Contents/Resources/optionXML.xml of "
                             "a previously-built package, in the "
                             "OrganizationName element."),
-        },
-        "serial_number": {
-            "required": False,
-            "description": "The serial number, if you are using serialized packages.",
-        },
-        "device_pool_name": {
-            "required": False,
-            "description": ("The 'Deployment Pool', if building a Teams Device "
-                            "License package is desired."),
-        },
-        "download_changed": {
-            "required": False,
-            "description": (
-                "download_changed is set by the CreativeCloudFeed processor to "
-                "indicate that a new product is available. If this key is set "
-                "in the environment and is False or empty the package workflow "
-                "will be skipped.")
-        },
+        }
     }
 
     output_variables = {
@@ -170,41 +123,11 @@ class CreativeCloudPackager(Processor):
             prefs["customer_type"] = user_type_elem.text.lower().split('_')[0]
         return prefs
 
-    # def automation_manifest_from_ccpinfo(self, scrub_serial=False):
-    #     """Returns a dict containing CCP automation data derived from the ccpinfo dict. Omits
-    #     irrelevant data such as output location and packaging job id.
-    #     scrub_serial will redact the serial number in cases where this dict
-    #     is being recorded to disk (along with the built package)."""
-    #     manifest = {}
-    #     # copy all defined params for this processor into a top-level dict
-    #     for param in self.input_variables.keys():
-    #         if param in self.env.keys():
-    #             # skip any parameters that are defined but empty strings,
-    #             # like serial_number or device_pool_name.
-    #             # CCP automation will pick a different package type depending on
-    #             # whether these elements exist or not, so we need to be careful
-    #             # to not copy a serial or device pool setting to the XML being
-    #             # fed to CCP, even if it's an empty string.
-    #             if self.env[param] == '':
-    #                 continue
-    #             manifest[param] = self.env[param]
-    #
-    #     manifest['products'] = []
-    #     manifest['products'].append({
-    #         'sap_code': self.env['product_id'],
-    #         'version': self.env['version'],
-    #     })
-    #     manifest['language'] = self.env['language']
-    #
-    #     if manifest.get('serial_number') and scrub_serial:
-    #         manifest['serial_number'] = 'REDACTED'
-    #     return manifest
-
     def automation_xml(self):
         """Returns the complete pretty-formatted XML string for a CCP automation
         session."""
         # params = self.automation_manifest_from_ccpinfo()
-        params = self.env['ccpinfo']
+        params = dict(self.env['ccpinfo'])
         params.update({
             'packageName': self.env['NAME'],
             'outputLocation': self.env['RECIPE_CACHE_DIR'],
@@ -328,16 +251,16 @@ class CreativeCloudPackager(Processor):
         self.set_customer_type(self.env['ccpinfo'])
         # Handle any pre-existing package at the expected location, and end early if it matches our
         # input manifest
-        # if os.path.exists(automation_manifest_plist_path):
-        #     existing_manifest = FoundationPlist.readPlist(automation_manifest_plist_path)
-        #     new_manifest = self.automation_manifest_from_env(scrub_serial=True)
-        #     self.output("Found existing CCP package build automation info, comparing")
-        #     self.output("existing build: %s" % existing_manifest)
-        #     self.output("current build: %s" % new_manifest)
-        #     if new_manifest == existing_manifest:
-        #         self.output("Returning early because we have an existing package "
-        #                     "with the same parameters.")
-        #         return
+        if os.path.exists(automation_manifest_plist_path):
+            existing_manifest = FoundationPlist.readPlist(automation_manifest_plist_path)
+            new_manifest = self.env['ccpinfo']
+            self.output("Found existing CCP package build automation info, comparing")
+            self.output("existing build: %s" % existing_manifest)
+            self.output("current build: %s" % new_manifest)
+            if new_manifest == existing_manifest:
+                self.output("Returning early because we have an existing package "
+                            "with the same parameters.")
+                return
 
         # Going forward with building, set up or clear needed directories
         xml_workdir = os.path.join(self.env["RECIPE_CACHE_DIR"], 'automation_xml')
@@ -412,7 +335,7 @@ class CreativeCloudPackager(Processor):
         shutil.copy(xml_path, saved_automation_xml_path)
         # TODO: we aren't scrubbing the automation XML file at all
         FoundationPlist.writePlist(
-            self.automation_manifest_from_env(scrub_serial=True),
+            self.env['ccpinfo'],
             automation_manifest_plist_path)
 
         # Save PackageInfo.txt
