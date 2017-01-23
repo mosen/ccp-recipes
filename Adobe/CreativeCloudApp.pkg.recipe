@@ -27,7 +27,7 @@ Other Input values here correspond to options provided in the CCP UI.</string>
         <key>Input</key>
         <dict>
             <key>NAME</key>
-            <string>AdobePhotoshopCC2017</string>
+            <string>CreativeCloudApp</string>
             <!-- Org name is shown in the upper right hand corner of the Enterprise Dashboard web interface -->
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_OVERRIDE</string>
@@ -55,6 +55,8 @@ Other Input values here correspond to options provided in the CCP UI.</string>
             <string></string>
             <key>DEPLOYMENT_POOL</key>
             <string></string>
+            <key>MATCH_OS_LANGUAGE</key>
+            <string>true</string>
         </dict>
         <key>MinimumVersion</key>
         <string>0.4.0</string>
@@ -102,6 +104,8 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                     <string>%SERIAL_NUMBER%</string>
                     <key>device_pool_name</key>
                     <string>%DEPLOYMENT_POOL%</string>
+                    <key>match_os_language</key>
+                    <string>%MATCH_OS_LANGUAGE%</string>
                 </dict>
             </dict>
         </array>

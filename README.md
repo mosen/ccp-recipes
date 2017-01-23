@@ -5,6 +5,7 @@ AutoPkg recipes for Creative Cloud Packager workflows
 ## Overview
 
 These processors and recipes may be used to automate the creation of Adobe Creative Cloud Packager packages.
+Based upon Adobes documentation for [Creative Cloud Packager Automation](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html)
 
 ## Getting Started
 

@@ -42,7 +42,7 @@ CCP_PREFS_FILE = os.path.expanduser(
 CCP_ERROR_MSGS = {
     "CustomerTypeMismatchError": \
         ("Please check that your organization is of the correct "
-         "type, either 'enterprise' or 'team'."),
+         "type, one of ({}).".format(', '.join(CUSTOMER_TYPES))),
     "TronWelcomeInputValidationError": \
         ("Please check that your ORG_NAME matches one to which your "
          "CCP-signed-in user ""belongs."),
@@ -107,6 +107,11 @@ class CreativeCloudPackager(Processor):
             "required": False,
             "default": True,
             "description": "Include all available updates, defaults to true.",
+        },
+        "match_os_language": {
+            "required": False,
+            "default": "true",
+            "description": "Match the Operating System language when building packages, default is True."
         },
         "language": {
             "required": False,
@@ -225,7 +230,11 @@ class CreativeCloudPackager(Processor):
         is_64.text = 'true'
         pkg_elem.append(is_64)
         match_os = ElementTree.Element('matchOSLanguage')
-        match_os.text = 'true'
+        if params.get('match_os_language', 'true').lower() == 'false':
+            match_os.text = 'false'
+        else:
+            match_os.text = 'true'
+
         pkg_elem.append(match_os)
 
         # substituting snake case for camel case for all top-level elements
@@ -289,15 +298,15 @@ class CreativeCloudPackager(Processor):
 
     def set_customer_type(self):
         # Set the customer type, using CCP's preferences if none provided
-        if not self.env.get("customer_type"):
-            ccp_prefs = self.ccp_preferences()
-            self.env['customer_type'] = ccp_prefs.get("customer_type")
-            if not self.env.get("customer_type"):
-                raise ProcessorError(
-                    "No customer_type input provided and unable to read one "
-                    "from %s" % CCP_PREFS_FILE)
-            self.output("Using customer type '%s' found in CCPPreferences: %s'"
-                        % (self.env['customer_type'], CCP_PREFS_FILE))
+        # if not self.env.get("customer_type"):
+        #     ccp_prefs = self.ccp_preferences()
+        #     self.env['customer_type'] = ccp_prefs.get("customer_type")
+        #     if not self.env.get("customer_type"):
+        #         raise ProcessorError(
+        #             "No customer_type input provided and unable to read one "
+        #             "from %s" % CCP_PREFS_FILE)
+        #     self.output("Using customer type '%s' found in CCPPreferences: %s'"
+        #                 % (self.env['customer_type'], CCP_PREFS_FILE))
 
         if self.env['customer_type'] not in CUSTOMER_TYPES:
             raise ProcessorError(
