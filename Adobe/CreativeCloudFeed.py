@@ -229,7 +229,7 @@ class CreativeCloudFeed(Processor):
                 channel_data[channel['name']] = channel
                 channel_cdn[channel['name']] = channel.get('cdn')
 
-        product = {'version': '1.0'}
+        product = {'version': '0.0.1'}
         for channel in data['channel']:
             if channel['name'] not in channels:
                 continue
