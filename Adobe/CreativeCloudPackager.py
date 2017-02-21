@@ -25,6 +25,7 @@ import subprocess
 import uuid
 
 from xml.etree import ElementTree
+from Foundation import CFPreferencesCopyAppValue
 import FoundationPlist
 
 from autopkglib import Processor, ProcessorError
@@ -322,11 +323,28 @@ class CreativeCloudPackager(Processor):
         status = subprocess.call(['/usr/bin/pgrep', '-q', 'PDApp'])
         return status == 0
 
+    def check_disabled_appnap(self):
+        """Log a warning if AppNap isn't disabled on the system."""
+        appnap_disabled = CFPreferencesCopyAppValue(
+            'NSAppSleepDisabled',
+            '.GlobalPreferences'
+        )
+        if not appnap_disabled:
+            self.output("WARNING: A bug in Creative Cloud Packager makes "
+                        "it likely to stall indefinitely whenever it is not "
+                        "the foreground application due to App Nap, which is "
+                        "currently enabled on this system. To prevent this, "
+                        "you may wish to disable it on the system for the "
+                        "current user using this command: "
+                        "'defaults write -g NSAppSleepDisabled -bool true'. "
+                        "Re-enable it at any time using 'defaults delete -g "
+                        "NSAppSleepDisabled'")
+
     def main(self):
         # if 'download_changed' in self.env and not self.env['download_changed']:
         #     self.output("Skipping CCP build: version has not changed.")
         #     return
-        
+
         # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
         self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
@@ -370,6 +388,8 @@ class CreativeCloudPackager(Processor):
                 "You cannot start a Creative Cloud Packager automation workflow " +
                 "if Creative Cloud Packager is already running. Please quit CCP and start this recipe again."
             )
+
+        self.check_disabled_appnap()
 
         cmd = [
             '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
