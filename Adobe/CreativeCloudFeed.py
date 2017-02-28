@@ -242,12 +242,18 @@ class CreativeCloudFeed(Processor):
 
         # Fetch Icon
         if 'productIcons' in product:
+            largest_width = 0
+            largest_icon_url = None
             for icon in product['productIcons'].get('icon', []):
-                if icon.get('size') == '96x96':
-                    extended_info['icon_url'] = icon.get('value')
-                    break
+                self.output('Considering icon: {}'.format(icon))
+                w, h = icon.get('size', '0x0').split('x', 2)
+                if int(w) > largest_width:
+                    largest_width = int(w)
+                    largest_icon_url = icon.get('value')
 
-        if 'icon_url' in extended_info and self.env.get('fetch_icon', False):
+            self.env['icon_url'] = largest_icon_url
+
+        if 'icon_url' in self.env and self.env.get('fetch_icon', False):
             self.output('Fetching icon from {}'.format(self.env['icon_url']))
             req = urllib2.Request(self.env['icon_url'], headers=HEADERS)
             content = urllib2.urlopen(req).read()
@@ -257,6 +263,7 @@ class CreativeCloudFeed(Processor):
 
             extended_info['icon_path'] = '{}/Icon.png'.format(self.env['RECIPE_CACHE_DIR'])
         else:
+            self.output('An icon was requested but we were unable to download one.')
             extended_info['icon_path'] = ''
 
         # Fetch Manifest + Proxy
