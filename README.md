@@ -12,9 +12,10 @@ Based upon Adobes documentation for [Creative Cloud Packager Automation](https:/
 __Prerequisites:__
 
 * [AutoPkg](https://autopkg.github.io/autopkg/)
-* [Adobe Creative Cloud Packager for macOS](https://www.adobe.com/go/ccp_installer_osx) *Requires Creative Cloud Sign-In*
+* [Adobe Creative Cloud Packager (CCP) for macOS](https://www.adobe.com/go/ccp_installer_osx) *Requires Creative Cloud Sign-In*
 * If you haven't yet run the Creative Cloud Packager, you must do this manually at least once to establish which account/organization you will be using to create further packages.
 * This recipe repo must be added to AutoPkg.
+* It is _strongly_ recommended to disable App Nap, as CCP has a tendency to sleep and stall downloads indefinitely if it is ever not the foreground application. This can be done globally (for the current user) using `defaults write NSGlobalDomain NSAppSleepDisabled -bool YES`. It does not seem possible to disable it selectively for the CCP application.
 
 ### Creating the overrides
 

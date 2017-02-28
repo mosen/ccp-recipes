@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright 2016 Mosen/Tim Sutton
+# Copyright 2016-2017 Mosen/Tim Sutton
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -204,9 +204,10 @@ class CreativeCloudFeed(Processor):
 
     def filter_product(self, data, sap_code, base_version, version='latest'):
         """Find product information from a feed dump given a single sap_code, base version and optional version."""
-        product = {'version': '1.0'}
+        product = {'version': '0.0.1'}
         channels = string.split(self.env.get('channels'), ',')
-        
+
+        #12 inputs to ccpinfo dict testing w BridgeCC
         for channel in data['channel']:
             if channel['name'] not in channels:
                 continue
