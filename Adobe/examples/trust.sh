@@ -4,7 +4,7 @@ AUTOPKG=/usr/local/bin/autopkg
 RECIPES=*.recipe
 
 for r in ${RECIPES}; do
-    echo Updating trust information for ./${r}
-    ${AUTOPKG} update-trust-info ./${r}
+    echo Updating trust information for ${r}
+    ${AUTOPKG} update-trust-info ${r}
 done
 
