@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Description</key>
+        <string>Build and import a Creative Cloud Application into munki (for applications that do not have an uninstaller)</string>
+        <key>Identifier</key>
+        <string>com.github.mosen.munki.Adobe.CreativeCloudAppNoUninstall</string>
+        <key>Input</key>
+        <dict>
+			<key>MUNKI_REPO_SUBDIR</key>
+			<string>apps/AdobeCC</string>
+			<key>pkginfo</key>
+			<dict>
+				<!-- supply for example your own description, category, developer, etc. -->
+			</dict>
+        </dict>
+        <key>MinimumVersion</key>
+        <string>1.0.0</string>
+        <key>ParentRecipe</key>
+        <string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
+        <key>Process</key>
+        <array>
+            <!-- Build the installer DMG for Munki containing the entire Build directory,
+            so that items like the .ccp file persists with the installer. This may be
+            useful for auditing purposes later. -->
+            <dict>
+                <key>Processor</key>
+                <string>DmgCreator</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>dmg_root</key>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%</string>
+                    <key>dmg_path</key>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.dmg</string>
+                </dict>
+            </dict>
+            <dict>
+                <key>Arguments</key>
+                <dict>
+                    <key>additional_pkginfo</key>
+                    <dict>
+                        <key>version</key>
+                        <string>%version%</string>
+                        <key>minimum_os_version</key>
+                        <string>%minimum_os_version%</string>
+                        <key>display_name</key>
+                        <string>%display_name%</string>
+                    </dict>
+                </dict>
+                <key>Processor</key>
+                <string>MunkiPkginfoMerger</string>
+            </dict>
+            <dict>
+                <key>Arguments</key>
+                <dict>
+                    <key>pkg_path</key>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.dmg</string>
+                    <key>uninstaller_pkg_path</key>
+                    <string></string>
+                    <key>repo_subdirectory</key>
+                    <string>%MUNKI_REPO_SUBDIR%</string>
+                </dict>
+                <key>Processor</key>
+                <string>MunkiImporter</string>
+            </dict>
+        </array>
+    </dict>
+</plist>
