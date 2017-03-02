@@ -52,6 +52,29 @@
 		<dict>
 			<key>blocking_applications</key>
 			<array>
+				<!-- Creative Cloud -->
+				<string>Creative Cloud</string>
+				<string>Adobe Application Manager</string>
+				<string>AAM Updates Notifier</string>
+				<string>Adobe Application Manager (Updater)</string>
+				<!-- Setup app -->
+
+				<!-- Camera Raw -->
+				<string>Adobe After Effects CC 2017</string>
+				<string>Adobe After Effects CC</string>
+				<string>Adobe Bridge CC 2017</string>
+				<string>Adobe Photoshop CC 2015</string>
+				<string>Adobe Photoshop CC 2017</string>
+				<string>Adobe Bridge CC 2015</string>
+				<string>Adobe After Effects CC 2015.3 (13.8)</string>
+				<string>Adobe Photoshop CC 2015.5</string>
+				<string>Adobe Animate CC 2017</string>
+				<string>Adobe Photoshop CC 2014</string>
+				<string>Adobe Bridge CC</string>
+				<string>Adobe Animate CC 2015.2</string>
+				<string>Adobe Photoshop CC</string>
+				<string>Adobe After Effects CC 2014</string>
+				<string>Adobe After Effects CC 2015</string>
 			</array>
 			<key>catalogs</key>
 			<array>
