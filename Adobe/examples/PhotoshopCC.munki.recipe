@@ -54,6 +54,17 @@
             <dict>
                 <key>blocking_applications</key>
                 <array>
+                    <!-- Creative Cloud / Installer -->
+                    <string>Creative Cloud</string>
+                    <string>Adobe Application Manager</string>
+                    <string>AAM Updates Notifier</string>
+                    <string>Adobe Application Manager (Updater)</string>
+
+                    <!-- Camera Raw CC -->
+                    <!-- omitted: basically all products -->
+
+                    <string>Adobe Photoshop CC 2017</string>
+                    
                 </array>
                 <key>catalogs</key>
                 <array>

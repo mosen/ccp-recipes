@@ -52,6 +52,11 @@
             <dict>
                 <key>blocking_applications</key>
                 <array>
+                    <string>Creative Cloud</string>
+                    <string>Adobe Application Manager</string>
+                    <string>AAM Updates Notifier</string>
+                    <string>Adobe Application Manager (Updater)</string>
+                    <string>Adobe Illustrator CC 2017</string>
                 </array>
                 <key>catalogs</key>
                 <array>
