@@ -10,6 +10,7 @@
             <string>AdobeAcrobatDC</string>
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
+
             <key>ccpinfo</key>
             <dict>
                 <key>matchOSLanguage</key>
@@ -38,7 +39,7 @@
                         <key>sapCode</key>
                         <string>APRO</string>
                         <key>baseVersion</key>
-                        <string></string>
+                        <string>15.0</string>
                         <key>version</key>
                         <string>15.0</string>
                     </dict>
@@ -63,6 +64,8 @@
                 </array>
                 <key>name</key>
                 <string>%NAME%</string>
+                <key>developer</key>
+                <string>Adobe</string>
                 <key>unattended_install</key>
                 <true/>
             </dict>

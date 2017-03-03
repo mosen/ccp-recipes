@@ -52,11 +52,23 @@
             <dict>
                 <key>blocking_applications</key>
                 <array>
+                    <!-- Creative Cloud -->
+                    <string>Creative Cloud</string>
+                    <string>Adobe Application Manager</string>
+                    <string>AAM Updates Notifier</string>
+                    <string>Adobe Application Manager (Updater)</string>
+                    <!-- Setup app -->
+
+                    <!-- Self -->
+                    <string>Adobe Experience Design CC (Beta)</string>
+                    <string>Adobe Experience Design CC (Preview)</string>
                 </array>
                 <key>catalogs</key>
                 <array>
                     <string>testing</string>
                 </array>
+                <key>developer</key>
+                <string>Adobe</string>
                 <key>name</key>
                 <string>%NAME%</string>
                 <key>unattended_install</key>

@@ -36,7 +36,7 @@
                 <array>
                     <dict>
                         <key>sapCode</key>
-                        <string>KFNT</string>
+                        <string>KCCC</string>
                         <key>baseVersion</key>
                         <string></string>
                         <key>version</key>
@@ -45,20 +45,25 @@
                 </array>
             </dict>
 
-            <key>parse_proxy_xml</key>
-            <true/>
-
             <key>MUNKI_REPO_SUBDIR</key>
             <string>apps/Adobe</string>
             <key>pkginfo</key>
             <dict>
                 <key>blocking_applications</key>
                 <array>
+                    <!-- Creative Cloud -->
+                    <string>Creative Cloud</string>
+                    <string>Adobe Application Manager</string>
+                    <string>AAM Updates Notifier</string>
+                    <string>Adobe Application Manager (Updater)</string>
+                    <!-- Setup app -->
                 </array>
                 <key>catalogs</key>
                 <array>
                     <string>testing</string>
                 </array>
+                <key>developer</key>
+                <string>Adobe</string>
                 <key>name</key>
                 <string>%NAME%</string>
                 <key>unattended_install</key>
