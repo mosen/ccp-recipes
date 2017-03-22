@@ -54,15 +54,6 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                 <key>adminPrivilegesEnabled</key>
                 <true/>
 
-                <!-- Include updates available for specified Product(s) -->
-                <key>IncludeUpdates</key>
-                <true/>
-
-                <!-- Use 64-bit platform, should always be true -->
-                <key>is64Bit</key>
-                <true/>
-
-                <!-- organizationName, may be overridden by ORG_NAME -->
                 <key>organizationName</key>
                 <string>ADMIN_PLEASE_CHANGE</string>
 

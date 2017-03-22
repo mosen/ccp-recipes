@@ -128,10 +128,15 @@ class CreativeCloudPackager(Processor):
         session."""
         # params = self.automation_manifest_from_ccpinfo()
         params = dict(self.env['ccpinfo'])
+        
+        # add additional parameters for which there's no need for the user to
+        # supply in the 'ccpinfo' input
         params.update({
             'packageName': self.env['NAME'],
             'outputLocation': self.env['RECIPE_CACHE_DIR'],
             'packaging_job_id': str(uuid.uuid4()),
+            'IncludeUpdates': False,
+            'is64Bit': True,
         })
 
         # if params.get('serial_number') and scrub_serial:
