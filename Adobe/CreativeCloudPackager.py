@@ -23,9 +23,10 @@ import os
 import shutil
 import subprocess
 import uuid
+import FoundationPlist
 
 from xml.etree import ElementTree
-import FoundationPlist
+from Foundation import CFPreferencesCopyAppValue, CFPreferencesSetAppValue
 
 from autopkglib import Processor, ProcessorError
 
@@ -222,6 +223,25 @@ class CreativeCloudPackager(Processor):
         status = subprocess.call(['/usr/bin/pgrep', '-q', 'PDApp'])
         return status == 0
 
+    def check_and_disable_appnap_for_pdapp(self):
+        """Log a warning if AppNap isn't disabled on the system."""
+        appnap_disabled = CFPreferencesCopyAppValue(
+            'NSAppSleepDisabled',
+            'com.adobe.PDApp')
+        if not appnap_disabled:
+            self.output("WARNING: A bug in Creative Cloud Packager makes "
+                        "it likely to stall indefinitely whenever the app "
+                        "window is hidden or obscured due to App Nap. To "
+                        "prevent this, we're setting a user preference to "
+                        "disable App Nap for just the "
+                        "Adobe PDApp application. This can be undone using "
+                        "this command: 'defaults delete com.adobe.PDApp "
+                        "NSAppSleepDisabled")
+            CFPreferencesSetAppValue(
+                'NSAppSleepDisabled',
+                True,
+                'com.adobe.PDApp')
+
     def validate_input(self):
         """Validate input variables will produce something meaningful."""
         ccpinfo = self.env['ccpinfo']
@@ -290,6 +310,8 @@ class CreativeCloudPackager(Processor):
                 "You cannot start a Creative Cloud Packager automation workflow " +
                 "if Creative Cloud Packager is already running. Please quit CCP and start this recipe again."
             )
+
+        self.check_and_disable_appnap_for_pdapp()
 
         cmd = [
             '/Applications/Utilities/Adobe Application Manager/core/Adobe Application Manager.app/Contents/MacOS/PDApp',
