@@ -28,8 +28,6 @@ Other Input values here correspond to options provided in the CCP UI.</string>
         <dict>
             <key>NAME</key>
             <string>CreativeCloudApp</string>
-            <key>ORG_NAME</key>
-            <string>ADMIN_PLEASE_CHANGE</string>
             <key>ccpinfo</key>
             <dict>
                 <!-- Boolean flags -->
@@ -54,6 +52,7 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                 <key>adminPrivilegesEnabled</key>
                 <true/>
 
+                <!-- Name of the organization (can be retrieved from ~/Library/Logs/PDApp.log) -->
                 <key>organizationName</key>
                 <string>ADMIN_PLEASE_CHANGE</string>
 
@@ -96,8 +95,6 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                 <dict>
                     <key>package_name</key>
                     <string>%NAME%</string>
-                    <key>organization_name</key>
-                    <string>%ORG_NAME%</string>
                 </dict>
             </dict>
         </array>

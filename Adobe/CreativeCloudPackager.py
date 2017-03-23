@@ -83,15 +83,6 @@ class CreativeCloudPackager(Processor):
             "required": True,
             "description": "The output package name",
         },
-        "organization_name": {
-            "required": True,
-            "description": ("The organization name which must match your "
-                            "licensed organization. This can be obtained from "
-                            "either the Enterprise Dashboard (upper right), or "
-                            "by looking in Contents/Resources/optionXML.xml of "
-                            "a previously-built package, in the "
-                            "OrganizationName element. This overrides the organizationName in ccpinfo"),
-        }
     }
 
     output_variables = {
@@ -167,9 +158,6 @@ class CreativeCloudPackager(Processor):
                 value = str(value).lower()
             elem.text = value
 
-            if param == 'organizationName' and self.env.get('organization_name'):
-                elem.text = self.env['organization_name']
-                
             pkg_elem.append(elem)
 
         # Products
@@ -254,7 +242,7 @@ class CreativeCloudPackager(Processor):
                 raise ProcessorError('ccpinfo product did not contain a SAP Code')
 
         if 'organizationName' not in ccpinfo or ccpinfo['organizationName'] == 'ADMIN_PLEASE_CHANGE':
-            raise ProcessorError('no organization name specified in recipe.')
+            raise ProcessorError('No organization name specified in recipe.')
 
         if ccpinfo['customerType'] not in CUSTOMER_TYPES:
             raise ProcessorError(
