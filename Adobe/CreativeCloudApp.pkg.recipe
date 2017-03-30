@@ -28,35 +28,53 @@ Other Input values here correspond to options provided in the CCP UI.</string>
         <dict>
             <key>NAME</key>
             <string>CreativeCloudApp</string>
-            <!-- Org name is shown in the upper right hand corner of the Enterprise Dashboard web interface -->
-            <key>ORG_NAME</key>
-            <string>ADMIN_PLEASE_OVERRIDE</string>
-            <!-- 'enterprise' or 'team', or left blank we will read from CCP's prefs -->
-            <key>LICENSE_TYPE</key>
-            <string></string>
-			<!-- 'SAP code' -->
-            <key>PRODUCT_ID</key>
-            <string>ADMIN_PLEASE_OVERRIDE</string>
-            <key>BASE_VERSION</key>
-            <string>ADMIN_PLEASE_OVERRIDE</string>
-            <key>VERSION</key>
-            <string>latest</string>
-            <key>INCLUDE_UPDATES</key>
-            <true/>
-            <key>RUM_ENABLED</key>
-            <true/>
-            <key>UPDATES_ENABLED</key>
-            <false/>
-            <key>APPS_PANEL_ENABLED</key>
-            <false/>
-            <key>ADMIN_PRIVILEGES_ENABLED</key>
-            <false/>
-            <key>SERIAL_NUMBER</key>
-            <string></string>
-            <key>DEPLOYMENT_POOL</key>
-            <string></string>
-            <key>MATCH_OS_LANGUAGE</key>
-            <string>true</string>
+            <key>ccpinfo</key>
+            <dict>
+                <!-- Boolean flags -->
+
+                <!-- Build a package using the language set in the operating system -->
+                <key>matchOSLanguage</key>
+                <true/>
+
+                <!-- Enable Remote Update Manager -->
+                <key>rumEnabled</key>
+                <true/>
+
+                <!-- Updates Enabled -->
+                <key>updatesEnabled</key>
+                <false/>
+
+                <!-- Users may install apps via the Apps panel -->
+                <key>appsPanelEnabled</key>
+                <true/>
+
+                <!-- CCDA will have admin privileges, allowing Standard users to install Apps -->
+                <key>adminPrivilegesEnabled</key>
+                <true/>
+
+                <!-- Name of the organization (can be retrieved from ~/Library/Logs/PDApp.log) -->
+                <key>organizationName</key>
+                <string>ADMIN_PLEASE_CHANGE</string>
+
+                <!-- The customer license type: team or enterprise -->
+                <key>customerType</key>
+                <string>team</string>
+                <key>Language</key>
+                <string>en_US</string>
+
+                <!-- Products -->
+                <key>Products</key>
+                <array>
+                    <dict>
+                        <key>sapCode</key>
+                        <string></string>
+                        <key>baseVersion</key>
+                        <string></string>
+                        <key>version</key>
+                        <string>latest</string>
+                    </dict>
+                </array>
+            </dict>
         </dict>
         <key>MinimumVersion</key>
         <string>0.4.0</string>
@@ -65,15 +83,6 @@ Other Input values here correspond to options provided in the CCP UI.</string>
             <dict>
                 <key>Processor</key>
                 <string>CreativeCloudFeed</string>
-                <key>Arguments</key>
-                <dict>
-                    <key>product_id</key>
-                    <string>%PRODUCT_ID%</string>
-                    <key>base_version</key>
-                    <string>%BASE_VERSION%</string>
-                    <key>version</key>
-                    <string>%VERSION%</string>
-                </dict>
             </dict>
             <dict>
                 <key>Processor</key>
@@ -84,28 +93,8 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                 <string>CreativeCloudPackager</string>
                 <key>Arguments</key>
                 <dict>
-                    <key>organization_name</key>
-                    <string>%ORG_NAME%</string>
                     <key>package_name</key>
                     <string>%NAME%</string>
-                    <key>customer_type</key>
-                    <string>%LICENSE_TYPE%</string>
-                    <key>include_updates</key>
-                    <true/>
-                    <key>rum_enabled</key>
-                    <true/>
-                    <key>updates_enabled</key>
-                    <false/>
-                    <key>apps_panel_enabled</key>
-                    <false/>
-                    <key>admin_privileges_enabled</key>
-                    <false/>
-                    <key>serial_number</key>
-                    <string>%SERIAL_NUMBER%</string>
-                    <key>device_pool_name</key>
-                    <string>%DEPLOYMENT_POOL%</string>
-                    <key>match_os_language</key>
-                    <string>%MATCH_OS_LANGUAGE%</string>
                 </dict>
             </dict>
         </array>

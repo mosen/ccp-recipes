@@ -3,11 +3,11 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.pkg.Adobe.PreviewCC</string>
+        <string>local.munki.Adobe.CreativeCloud</string>
         <key>Input</key>
         <dict>
             <key>NAME</key>
-            <string>AdobePreviewCC</string>
+            <string>AdobeCreativeCloud</string>
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
             <key>ccpinfo</key>
@@ -36,7 +36,7 @@
                 <array>
                     <dict>
                         <key>sapCode</key>
-                        <string>PSTI</string>
+                        <string>KCCC</string>
                         <key>baseVersion</key>
                         <string></string>
                         <key>version</key>
@@ -44,8 +44,33 @@
                     </dict>
                 </array>
             </dict>
+
+            <key>MUNKI_REPO_SUBDIR</key>
+            <string>apps/Adobe</string>
+            <key>pkginfo</key>
+            <dict>
+                <key>blocking_applications</key>
+                <array>
+                    <!-- Creative Cloud -->
+                    <string>Creative Cloud</string>
+                    <string>Adobe Application Manager</string>
+                    <string>AAM Updates Notifier</string>
+                    <string>Adobe Application Manager (Updater)</string>
+                    <!-- Setup app -->
+                </array>
+                <key>catalogs</key>
+                <array>
+                    <string>testing</string>
+                </array>
+                <key>developer</key>
+                <string>Adobe</string>
+                <key>name</key>
+                <string>%NAME%</string>
+                <key>unattended_install</key>
+                <true/>
+            </dict>
         </dict>
         <key>ParentRecipe</key>
-        <string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
+        <string>com.github.mosen.munki.Adobe.CreativeCloudAppNoUninstall</string>
     </dict>
 </plist>

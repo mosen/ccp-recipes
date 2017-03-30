@@ -3,11 +3,11 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.pkg.Adobe.PreviewCC</string>
+        <string>local.pkg.Adobe.ExtensionManagerCC</string>
         <key>Input</key>
         <dict>
             <key>NAME</key>
-            <string>AdobePreviewCC</string>
+            <string>AdobeExtensionManagerCC</string>
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
             <key>ccpinfo</key>
@@ -36,7 +36,7 @@
                 <array>
                     <dict>
                         <key>sapCode</key>
-                        <string>PSTI</string>
+                        <string>KEMN</string>
                         <key>baseVersion</key>
                         <string></string>
                         <key>version</key>
