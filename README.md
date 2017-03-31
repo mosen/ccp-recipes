@@ -32,6 +32,7 @@ AutoPkg will create an override file in your RecipeOverrides folder. Edit the re
 The minimum amount of information you need to put in the override is:
 
 - **Your organization name**: which is displayed on the top left of the enterprise dashboard or 'manage your team' dashboard.
+    We have provided a script `whats_my_org.sh` to scrape your organization name from the logs for convenience.
 
 - **A product id**: for the product you want to package. This is a 4 letter code which you can find by running the `listfeed.py` script in this repo.
 
