@@ -20,6 +20,7 @@ __Prerequisites:__
 ### Creating the overrides
 
 As a rule, this repository does not contain recipes for each individual product, because each organization will require different things.
+There are some examples provided however.
 
 As an example, we will be creating an override recipe for Photoshop CC 2017.
 
@@ -50,15 +51,65 @@ The minimum amount of information you need to put in the override is:
 
     There is a special value for `VERSION` which is `latest`. This means the latest update for the specified base version will always be used.
 
-Now run your override recipe and you should see CCP download and build the package!
+    *NOTE:* Some products require an empty base version and a specific version (not latest): Acrobat and Creative Cloud Desktop App for example.
+
+### The ccpinfo Input
+
+The only input is **ccpinfo** which describes how your package should be built and what is included.
+
+You must have at least an **organizationName**, **sapCode** and some version information.
+
+Example:
+
+            <key>ccpinfo</key>
+            <dict>
+                <key>matchOSLanguage</key>
+                <true/>
+                <key>rumEnabled</key>
+                <true/>
+                <key>updatesEnabled</key>
+                <false/>
+                <key>appsPanelEnabled</key>
+                <true/>
+                <key>adminPrivilegesEnabled</key>
+                <true/>
+                <key>IncludeUpdates</key>
+                <true/>
+                <key>is64Bit</key>
+                <true/>
+                <key>organizationName</key>
+                <string>ADMIN_PLEASE_CHANGE</string>
+                <key>customerType</key>
+                <string>team</string>
+                <key>Language</key>
+                <string>en_US</string>
+                <key>Products</key>
+                <array>
+                    <dict>
+                        <key>sapCode</key>
+                        <string>PHSP</string>
+                        <key>baseVersion</key>
+                        <string></string>
+                        <key>version</key>
+                        <string>latest</string>
+                    </dict>
+                </array>
+            </dict>
+
+
+
+The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. 
+The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html)
 
 ## Troubleshooting
 
-- Most CCP related errors will return a validation error, even though they may be completely unrelated to validation. You should check the PDApp.log file to get to the real cause of the problem.
+- Most CCP related errors will return a validation error, even though they may be completely unrelated to validation. 
+    You should check the PDApp.log file to get to the real cause of the problem.
 
 - You may see an error if there is a new CCP update pending. You will need to launch CCP manually to perform the update before you can proceed.
 
-- CCP will quit immediately if a package with the same version already exists in the output folder. This processor should detect the existence of those files and skip packaging if this is the case.
+- CCP will quit immediately if a package with the same version already exists in the output folder. 
+    This processor should detect the existence of those files and skip packaging if this is the case.
 
 ## Processor Reference
 
