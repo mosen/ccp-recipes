@@ -12,7 +12,7 @@ These processors and recipes may be used to automate the creation of Adobe Creat
 
 * [AutoPkg](https://autopkg.github.io/autopkg/)
 * [Adobe Creative Cloud Packager (CCP) for macOS](https://www.adobe.com/go/ccp_installer_osx)
-* An Adobe ID which is able to sign into either the [Teams](https://adminconsole.adobe.com/team) or [Enterprise](https://adminconsole.adobe.com/enterprise) dashboards and has the ability to build packages (for Enterprise this is at least the 'Deployment Admin' role)
+* An Adobe ID which is able to sign into either the [Teams](https://adminconsole.adobe.com/team) or [Enterprise](https://adminconsole.adobe.com/enterprise) dashboards and has the ability to build packages (for Enterprise this is at least the [Deployment Admin](https://helpx.adobe.com/enterprise/help/admin-roles.html) role)
 * You must run CCP once manually in order to sign in as the account/organization you will be using to create further packages.
 * This recipe repo must be added to AutoPkg.
 * There must be no other Adobe CC applications or the Creative Cloud application installed on the machine building packages.
