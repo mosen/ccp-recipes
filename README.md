@@ -4,17 +4,26 @@ AutoPkg recipes for Creative Cloud Packager workflows
 
 ## Overview
 
-These processors and recipes may be used to automate the creation of Adobe Creative Cloud Packager packages.
-Based upon Adobes documentation for [Creative Cloud Packager Automation](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html)
+These processors and recipes may be used to automate the creation of Adobe Creative Cloud Packager (CCP) packages, using Adobe's provided [automation](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html) support. Currently, `.pkg` and `.munki` recipes are provided.
 
 ## Getting Started
 
-__Prerequisites:__
+### Prerequisites
 
 * [AutoPkg](https://autopkg.github.io/autopkg/)
-* [Adobe Creative Cloud Packager (CCP) for macOS](https://www.adobe.com/go/ccp_installer_osx) *Requires Creative Cloud Sign-In*
-* If you haven't yet run the Creative Cloud Packager, you must do this manually at least once to establish which account/organization you will be using to create further packages.
+* [Adobe Creative Cloud Packager (CCP) for macOS](https://www.adobe.com/go/ccp_installer_osx)
+* An Adobe ID which is able to sign into either the [Teams](https://adminconsole.adobe.com/team) or [Enterprise](https://adminconsole.adobe.com/enterprise) dashboards and has the ability to build packages (for Enterprise this is at least the 'Deployment Admin' role)
+* You must run CCP once manually in order to sign in as the account/organization you will be using to create further packages.
 * This recipe repo must be added to AutoPkg.
+* There must be no other Adobe CC applications or the Creative Cloud application installed on the machine building packages.
+
+### Verifying your login
+
+First log into the CCP with your username and verify that you're able to select the appropriate organization type (Teams or Enterprise) and build a package. If your Adobe ID is part of several organizations, make sure to select the one you want to be associated with the AutoPkg-built packages.
+
+### Determining your organization name
+
+The CCP automation support requires us to specify the actual full name of the organization to which the user belongs as part of the initial authentication to build packages. There is a script in this repo, `whats_my_org.sh`, which will attempt to scrape the organization name from the most recent login from the CCP application logs. If this fails, you can determine the organization name by looking in the upper-left in the [Teams](https://adminconsole.adobe.com/team) dashboard or the upper-right in the [Enterprise](https://adminconsole.adobe.com/enterprise) dashboard.
 
 ### Creating the overrides
 
@@ -31,8 +40,7 @@ AutoPkg will create an override file in your RecipeOverrides folder. Edit the re
 
 The minimum amount of information you need to put in the override is:
 
-- **Your organization name**: which is displayed on the top left of the enterprise dashboard or 'manage your team' dashboard.
-    We have provided a script `whats_my_org.sh` to scrape your organization name from the logs for convenience.
+- **Your organization name**: the name described above in 'Determining your organization name'
 
 - **A product id**: for the product you want to package. This is a 4 letter code which you can find by running the `listfeed.py` script in this repo.
 
