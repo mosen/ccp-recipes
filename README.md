@@ -34,31 +34,33 @@ As an example, we will be creating an override recipe for Photoshop CC 2017.
 
 In Terminal, run:
 
-    autopkg make-override -n PhotoshopCC2017.pkg CreativeCloudApp.pkg.recipe
+    autopkg make-override -n PhotoshopCC2017.pkg CreativeCloudApp.pkg
 
 AutoPkg will create an override file in your RecipeOverrides folder. Edit the resulting file with a text editor of your choice.
 
 The minimum amount of information you need to put in the override is:
 
-- **Your organization name**: the name described above in 'Determining your organization name'
+- **Your organization name**: The name described above in 'Determining your organization name'
 
-- **A product id**: for the product you want to package. This is a 4 letter code which you can find by running the `listfeed.py` script in this repo.
+- **An application SAP code**: This is a 3-4 letter code which you can find by running the `listfeed.py` script in this repo. Every application and any related update has an SAP code.
 
-- **A base version and/or product version**: some products have a base version which is 'updateable', and some can only be replaced entirely by specifying ONLY the version. If BaseVersion is not available, specify the VERSION only.
+- **A base version**: The base version defines the major version for a given application. The base version and the SAP code, together, uniquely identify any Adobe application.
 
-    For our example, Photoshop CC 2017, I ran the `listfeed.py` and found this in the output:
+    For the example of Photoshop CC 2017, running `listfeed.py` currently shows this in the output:
 
     ```
     SAP Code: PHSP
         <...lines omitted...>
-        Photoshop CC (2017)                                         	BaseVersion: 18.0          	Version: 18.0
+		Photoshop CC (2015.5)       BaseVersion: 17.0       Version: 17.0
+		Photoshop CC (2015.5)       BaseVersion: 17.0       Version: 17.0.1
+		Photoshop CC (2015.5)       BaseVersion: 17.0       Version: 17.0.2
+		Photoshop CC (2017)         BaseVersion: 18.0       Version: 18.0
+		Photoshop CC (2017)         BaseVersion: 18.0       Version: 18.0.1
+		Photoshop CC (2017)         BaseVersion: 18.0       Version: 18.1
+        Photoshop CC (2017)			BaseVersion: 18.0		Version: 18.1.1
     ```
-
-    I will use `PHSP` as the product id, and i will specify `18.0` for `BASE_VERSION`.
-
-    There is a special value for `VERSION` which is `latest`. This means the latest update for the specified base version will always be used.
-
-    *NOTE:* Some products require an empty base version and a specific version (not latest): Acrobat and Creative Cloud Desktop App for example.
+	
+	Notice how `BaseVersion` changes only with a major marketing version number change. Some products use `BaseVersion` values like `18.0`, others like `14.0.0`. Take care to specify these values exactly as they appear in the output of `listfeed.py`.
 
 ### The ccpinfo Input
 
@@ -68,42 +70,44 @@ You must have at least an **organizationName**, **sapCode** and some version inf
 
 Example:
 
-            <key>ccpinfo</key>
-            <dict>
-                <key>matchOSLanguage</key>
-                <true/>
-                <key>rumEnabled</key>
-                <true/>
-                <key>updatesEnabled</key>
-                <false/>
-                <key>appsPanelEnabled</key>
-                <true/>
-                <key>adminPrivilegesEnabled</key>
-                <true/>
-                <key>IncludeUpdates</key>
-                <true/>
-                <key>is64Bit</key>
-                <true/>
-                <key>organizationName</key>
-                <string>ADMIN_PLEASE_CHANGE</string>
-                <key>customerType</key>
-                <string>team</string>
-                <key>Language</key>
-                <string>en_US</string>
-                <key>Products</key>
-                <array>
-                    <dict>
-                        <key>sapCode</key>
-                        <string>PHSP</string>
-                        <key>baseVersion</key>
-                        <string></string>
-                        <key>version</key>
-                        <string>latest</string>
-                    </dict>
-                </array>
-            </dict>
+```plist
+<key>ccpinfo</key>
+<dict>
+    <key>matchOSLanguage</key>
+    <true/>
+    <key>rumEnabled</key>
+    <true/>
+    <key>updatesEnabled</key>
+    <false/>
+    <key>appsPanelEnabled</key>
+    <true/>
+    <key>adminPrivilegesEnabled</key>
+    <true/>
+    <key>is64Bit</key>
+    <true/>
+    <key>organizationName</key>
+    <string>ADMIN_PLEASE_CHANGE</string>
+    <key>customerType</key>
+    <string>team</string>
+    <key>Language</key>
+    <string>en_US</string>
+    <key>Products</key>
+    <array>
+        <dict>
+            <key>sapCode</key>
+            <string>PHSP</string>
+            <key>baseVersion</key>
+            <string>18.0</string>
+            <key>version</key>
+            <string>latest</string>
+        </dict>
+    </array>
+</dict>
+```
 
+Worth noting above is the `version` key, which is set here to `latest` (which is also the default if omitted). This can instead be set to the original base version if you'd like to build that version instead. Currently it does not seem like CCP will allow you to build any additional versions that may be "in between" the original release and the current latest.
 
+As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items.
 
 The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. 
 The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html)
@@ -114,9 +118,6 @@ The format of this file is described further in [This Adobe Article](https://hel
     You should check the PDApp.log file to get to the real cause of the problem.
 
 - You may see an error if there is a new CCP update pending. You will need to launch CCP manually to perform the update before you can proceed.
-
-- CCP will quit immediately if a package with the same version already exists in the output folder. 
-    This processor should detect the existence of those files and skip packaging if this is the case.
 
 ## Processor Reference
 
