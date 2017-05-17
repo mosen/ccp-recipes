@@ -260,13 +260,15 @@ class CreativeCloudPackager(Processor):
         ccda_path = '/Applications/Utilities/Adobe Creative Cloud/ACC/Creative Cloud.app'
         if os.path.isdir(ccda_path):
             raise ProcessorError(
-                ("Adobe Creative Cloud Desktop App was detected at %s. "
+                ("The Adobe Creative Cloud Desktop App was detected at '%s'. "
                  "This recipe will only run on systems without it installed, "
                  "as it can otherwise cause major issues with built packages. "
                  "It can be uninstalled using the Uninstaller located at "
-                 "'/Applications/Utilities/Adobe Creative Cloud") % ccda_path)
+                 "'/Applications/Utilities/Adobe Creative Cloud'.") % ccda_path)
 
     def main(self):
+        self.check_ccda_installed()
+
         # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
         self.env["pkg_path"] = os.path.join(expected_output_root, "Build/%s_Install.pkg" % self.env["package_name"])
