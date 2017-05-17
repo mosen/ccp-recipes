@@ -254,6 +254,18 @@ class CreativeCloudPackager(Processor):
                 ("Serial number was given, but serial numbers are only for "
                  "use with 'enterprise' customer types."))
 
+    def check_ccda_installed(self):
+        """Check and raise a ProcessorError if the CCDA is installed, as CCP should
+        never build packages on a system with the CCDA installed"""
+        ccda_path = '/Applications/Utilities/Adobe Creative Cloud/ACC/Creative Cloud.app'
+        if os.path.isdir(ccda_path):
+            raise ProcessorError(
+                ("Adobe Creative Cloud Desktop App was detected at %s. "
+                 "This recipe will only run on systems without it installed, "
+                 "as it can otherwise cause major issues with built packages. "
+                 "It can be uninstalled using the Uninstaller located at "
+                 "'/Applications/Utilities/Adobe Creative Cloud") % ccda_path)
+
     def main(self):
         # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
