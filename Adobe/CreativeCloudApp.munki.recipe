@@ -8,21 +8,25 @@
         <string>com.github.mosen.munki.Adobe.CreativeCloudApp</string>
         <key>Input</key>
         <dict>
-			<key>MUNKI_REPO_SUBDIR</key>
-			<string>apps/AdobeCC</string>
-			<!-- pkginfo: supply for example your own description, category, etc.
-						  - display_name is set automatically but you may override your own -->
-			<key>pkginfo</key>
-			<dict>
-	            <key>catalogs</key>
-	            <array>
-	                <string>testing</string>
-	            </array>
-				<key>developer</key>
-				<string>Adobe</string>
-				<key>name</key>
-				<string>%NAME%</string>
-			</dict>
+            <key>MUNKI_REPO_SUBDIR</key>
+            <string>apps/AdobeCC</string>
+            <!-- pkginfo: supply for example your own description, category, etc.
+                 The following elements are set automatically according to Adobe's package metadata,
+                 however you may still override them yourself:
+                 - display_name
+                 - minimum_os_version
+            -->
+            <key>pkginfo</key>
+            <dict>
+                <key>catalogs</key>
+                <array>
+                    <string>testing</string>
+                </array>
+                <key>developer</key>
+                <string>Adobe</string>
+                <key>name</key>
+                <string>%NAME%</string>
+            </dict>
         </dict>
         <key>MinimumVersion</key>
         <string>1.0.0</string>
