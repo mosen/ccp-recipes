@@ -4,7 +4,19 @@ AutoPkg recipes for Creative Cloud Packager workflows
 
 ## Overview
 
-These processors and recipes may be used to automate the creation of Adobe Creative Cloud Packager (CCP) packages, using Adobe's provided [automation](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html) support. Currently, `.pkg` and `.munki` recipes are provided.
+These processors and recipes may be used to automate the creation of Adobe Creative Cloud Packager (CCP) packages, using Adobe's provided [automation](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html) support. Currently there are three flavors of `CreativeCloudApp` recipes provided:
+
+#### pkg
+
+Uses CCP to build a package saved to disk, exactly as one would using the CCP GUI application.
+
+#### munki
+
+Use the pkg recipe, wrap both the installer and uninstaller in DMGs, and import these to a Munki repo.
+
+#### jss
+
+Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import and configure the package at a Jamf Pro instance.
 
 ## Getting Started
 
