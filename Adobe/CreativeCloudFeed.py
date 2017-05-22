@@ -146,6 +146,10 @@ class CreativeCloudFeed(Processor):
         req = urllib2.Request(proxy_data_url, headers=HEADERS)
         content = urllib2.urlopen(req).read()
 
+        # Write out the proxy for debugging purposes
+        with open('{}/proxy.xml'.format(self.env['RECIPE_CACHE_DIR']), 'w+') as fd:
+            fd.write(content)
+
         proxy_data = ElementTree.fromstring(content)
         return proxy_data
 
