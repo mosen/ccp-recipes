@@ -3,11 +3,11 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.pkg.Adobe.AfterEffectsCC</string>
+        <string>local.pkg.Adobe.AcrobatDC17</string>
         <key>Input</key>
         <dict>
             <key>NAME</key>
-            <string>AdobeAfterEffectsCC</string>
+            <string>AdobeAcrobatDC</string>
             <key>ORG_NAME</key>
             <string>ADMIN_PLEASE_CHANGE</string>
             <key>ccpinfo</key>
@@ -36,11 +36,11 @@
                 <array>
                     <dict>
                         <key>sapCode</key>
-                        <string>AEFT</string>
+                        <string>APRO</string>
                         <key>baseVersion</key>
                         <string></string>
                         <key>version</key>
-                        <string>latest</string>
+                        <string>17.0</string>
                     </dict>
                 </array>
             </dict>
