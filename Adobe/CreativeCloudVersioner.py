@@ -209,6 +209,7 @@ class CreativeCloudVersioner(Processor):
         ''' Create pkginfo will found details '''
         pkginfo = {}
         self.env["version"] = app_version
+        self.env["prod_name"] = self.env["display_name"]
         pkginfo["version"] = self.env["version"]
         pkginfo["display_name"] = self.env["display_name"]
         pkginfo["minimum_os_version"] = self.env["minimum_os_version"]
