@@ -63,9 +63,6 @@ class CreativeCloudVersioner(Processor):
             "description":
                 "Some pkginfo fields extracted from the Adobe metadata.",
         },
-        "display_name": {
-            "description": "The product full name and major version"
-        },
         "package_info_text": {
             "description": "Text notes about which packages and updates are included in the pkg."
         },
