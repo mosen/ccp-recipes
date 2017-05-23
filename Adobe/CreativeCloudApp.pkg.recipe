@@ -97,6 +97,10 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                     <string>%NAME%</string>
                 </dict>
             </dict>
+            <dict>
+                <key>Processor</key>
+                <string>CreativeCloudVersioner</string>
+            </dict>
         </array>
     </dict>
 </plist>
