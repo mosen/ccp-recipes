@@ -16,7 +16,7 @@ Use the pkg recipe, wrap both the installer and uninstaller in DMGs, and import 
 
 #### jss
 
-Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import the instgall & uninstall packages into a Jamf Pro instance, with the required policies created.
+Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import the install & uninstall packages into a Jamf Pro instance, with the required policies created.
 
 ## Getting Started
 
