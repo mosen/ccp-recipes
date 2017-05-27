@@ -48,10 +48,6 @@ class CreativeCloudVersioner(Processor):
             "required": True,
             "description": "Path to the built bundle-style CCP uninstaller pkg.",
         },
-        "display_name": {
-            "required": True,
-            "description": "The product full name and major version"
-        },
         "minimum_os_version": {
             "required": True,
             "description": "The minimum operating system version required to install this package"
@@ -62,6 +58,9 @@ class CreativeCloudVersioner(Processor):
         "additional_pkginfo": {
             "description":
                 "Some pkginfo fields extracted from the Adobe metadata.",
+        },
+        "jss_inventory_name": {
+            "description": "Application title for jamf pro smart group criteria.",
         },
         "package_info_text": {
             "description": "Text notes about which packages and updates are included in the pkg."
@@ -138,7 +137,7 @@ class CreativeCloudVersioner(Processor):
         #    self.output("app_identifier: %s" % app_identifier)
 
         # Now we have the deets, let"s use them
-        self.create_pkginfo(app_version, installed_path)
+        self.create_pkginfo(app_bundle, app_version, installed_path)
 
 
     def process_hd_installer(self):
@@ -202,14 +201,14 @@ class CreativeCloudVersioner(Processor):
                                     continue
 
         # Now we have the deets, let"s use them
-        self.create_pkginfo(app_version, installed_path)
+        self.create_pkginfo(app_bundle, app_version, installed_path)
 
 
-    def create_pkginfo(self, app_version, installed_path):
+    def create_pkginfo(self, app_bundle, app_version, installed_path):
         ''' Create pkginfo will found details '''
         pkginfo = {}
         self.env["version"] = app_version
-        self.env["prod_name"] = self.env["display_name"]
+        self.env["jss_inventory_name"] = app_bundle
         pkginfo["version"] = self.env["version"]
         pkginfo["display_name"] = self.env["display_name"]
         pkginfo["minimum_os_version"] = self.env["minimum_os_version"]

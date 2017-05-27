@@ -16,7 +16,7 @@ Use the pkg recipe, wrap both the installer and uninstaller in DMGs, and import 
 
 #### jss
 
-Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import and configure the package at a Jamf Pro instance.
+Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import the install & uninstall packages into a Jamf Pro instance, with the required policies created.
 
 ## Getting Started
 
@@ -253,3 +253,51 @@ Takes information about package(s) and your license information, and builds a pa
 
 - **ccp_version:**
     - **description:** Version of CCP tools used to build the package.
+    
+### CreativeCloudVersioner
+
+#### Description
+
+This processor raises an exception if not a HD or Acrobat Pro installer. The rationale is that the feed that the CreativeCloudFeed processor utilises only provides information on RIBS installer based titles base versions, (i.e. Prelude 9.0.0 & not 9.1.0).
+
+It's hoped that in time more titles will move to HD installers, & then these recipes will work with minor changes (if any).
+
+Once determined that the installer is either a HD or Acrobat Pro installer, the installers Application.json, .pimx & .zip is interogated to extract information detailed below.
+
+#### Input Variables
+- **ccpinfo:**
+    - **default:**
+    - **required:** True
+    - **description:** Creative Cloud Packager Product(s) Information.
+
+- **pkg_path:**
+    - **required:** True
+    - **description:** Path to the built bundle-style CCP installer pkg.
+
+- **uninstaller_pkg_path:**
+    - **required:** True
+    - **description:** Path to the built bundle-style CCP uninstaller pkg.
+ 
+- **display_name:**
+    - **required:** True
+    - **description:** The display name of the product, as in the feed e.g. `Photoshop CC (2017)`.
+
+- **minimum_os_version:**
+    - **required:** True
+    - **description:** The minimum OS version required to install the product.
+    
+ #### Output Variables
+ - **additional_pkginfo:**
+     - **description:** Some pkginfo fields extracted from the Adobe metadata, for Munki bundle installs array & Jamf policies.
+ 
+- **jss_inventory_name:**
+    - **description:** Application title for jamf pro smart group criteria.
+
+- **package_info_text:**
+    - **description:** Text notes about which packages and updates are included in the pkg.
+
+- **pkg_path:**
+    - **description:** Path to the built bundle-style CCP installer pkg.
+
+- **uninstaller_pkg_path:**
+    - **description:** Path to the built bundle-style CCP uninstaller pkg.

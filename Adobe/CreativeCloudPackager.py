@@ -124,7 +124,7 @@ class CreativeCloudPackager(Processor):
         # add additional parameters for which there's no need for the user to
         # supply in the 'ccpinfo' input
         params.update({
-            'packageName': self.env['NAME'],
+            'packageName': self.env['package_name'],
             'outputLocation': self.env['RECIPE_CACHE_DIR'],
             'packaging_job_id': str(uuid.uuid4()),
             'IncludeUpdates': False,
@@ -303,7 +303,7 @@ class CreativeCloudPackager(Processor):
         xml_data = self.automation_xml()
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
-        xml_path = os.path.join(xml_workdir, 'ccp_automation_%s.xml' % self.env['NAME'])
+        xml_path = os.path.join(xml_workdir, 'ccp_automation_%s.xml' % self.env['package_name'])
         with open(xml_path, 'w') as fd:
             fd.write(xml_data)
 
