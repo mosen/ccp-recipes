@@ -60,6 +60,10 @@ class CreativeCloudVersioner(Processor):
         "jss_inventory_name": {
             "description": "Application title for jamf pro smart group criteria.",
         },
+        "user_facing_version": {
+            "description": ("The version which would be seen in the application's About window, "
+                            "and which is referred to in documentation and marketing materials."),
+        },
         "version": {
             "description": ("The value of CFBundleShortVersionString for the app bundle. "
                             "This may match user_facing_version, but it may also be more "
@@ -71,6 +75,10 @@ class CreativeCloudVersioner(Processor):
     def main(self):
         ''' Read .json & .pimx to .app, then read info.plist'''
         ccpinfo = self.env["ccpinfo"]
+        # 'version' contains that which was extracted from the feed, which is
+        # actually what we want as a user-facing version, so just grab it
+        # immediately
+        self.env["user_facing_version"] = self.env["version"]
         self.env["prod"] = ccpinfo["Products"]
         self.env["sapCode"] = self.env["prod"][0]["sapCode"]
         self.output("sapCode: %s" % self.env["sapCode"])
