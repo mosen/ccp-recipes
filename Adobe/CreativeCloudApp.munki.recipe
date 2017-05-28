@@ -45,7 +45,7 @@
                     <key>dmg_root</key>
                     <string>%RECIPE_CACHE_DIR%/%NAME%</string>
                     <key>dmg_path</key>
-                    <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.dmg</string>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%user_facing_version%.dmg</string>
                 </dict>
             </dict>
             <dict>
@@ -56,20 +56,34 @@
                     <key>dmg_root</key>
                     <string>%uninstaller_pkg_path%</string>
                     <key>dmg_path</key>
-                    <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.dmg</string>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%user_facing_version%.dmg</string>
                 </dict>
             </dict>
+			<!-- Merge in a few items set by CreativeCloudPackager -->
             <dict>
                 <key>Processor</key>
                 <string>MunkiPkginfoMerger</string>
+            </dict>
+			<!-- Set the shorter, 'marketing' version for the pkginfo -->
+            <dict>
+                <key>Processor</key>
+                <string>MunkiPkginfoMerger</string>
+				<key>Arguments</key>
+				<dict>
+					<key>additional_pkginfo</key>
+					<dict>
+						<key>version</key>
+						<string>%user_facing_version%</string>
+					</dict>
+				</dict>
             </dict>
             <dict>
                 <key>Arguments</key>
                 <dict>
                     <key>pkg_path</key>
-                    <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.dmg</string>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%user_facing_version%.dmg</string>
                     <key>uninstaller_pkg_path</key>
-                    <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.dmg</string>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%user_facing_version%.dmg</string>
                     <key>repo_subdirectory</key>
                     <string>%MUNKI_REPO_SUBDIR%</string>
                 </dict>
