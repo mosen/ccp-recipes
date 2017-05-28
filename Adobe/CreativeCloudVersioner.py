@@ -33,8 +33,10 @@ __all__ = ["CreativeCloudVersioner"]
 
 
 class CreativeCloudVersioner(Processor):
-    '''Generates installs from CCP created installers '''
-    description = "Runs the CCP packager."
+    '''Parses generated CCP installers for detailed application path and bundle
+    version info, for use in Munki installs info and JSS application inventory
+    info for Smart Group templates'''
+    description = __doc__
     input_variables = {
         "ccpinfo": {
             "required": True,
@@ -43,10 +45,6 @@ class CreativeCloudVersioner(Processor):
         "pkg_path": {
             "required": True,
             "description": "Path to the built bundle-style CCP installer pkg.",
-        },
-        "uninstaller_pkg_path": {
-            "required": True,
-            "description": "Path to the built bundle-style CCP uninstaller pkg.",
         },
         "minimum_os_version": {
             "required": True,
@@ -62,14 +60,10 @@ class CreativeCloudVersioner(Processor):
         "jss_inventory_name": {
             "description": "Application title for jamf pro smart group criteria.",
         },
-        "package_info_text": {
-            "description": "Text notes about which packages and updates are included in the pkg."
-        },
-        "pkg_path": {
-            "description": "Path to the built bundle-style CCP installer pkg.",
-        },
-        "uninstaller_pkg_path": {
-            "description": "Path to the built bundle-style CCP uninstaller pkg.",
+        "version": {
+            "description": ("The value of CFBundleShortVersionString for the app bundle. "
+                            "This may match user_facing_version, but it may also be more "
+                            "specific and add another version component."),
         },
     }
 
@@ -169,7 +163,7 @@ class CreativeCloudVersioner(Processor):
                 with myzip.open(zip_file + ".pimx") as mytxt:
                     txt = mytxt.read()
                     tree = ElementTree.fromstring(txt)
-                    # Loop through .pmx"s Assets, look for target=[INSTALLDIR], then grab Assets Source.
+                    # Loop through .pmx's Assets, look for target=[INSTALLDIR], then grab Assets Source.
                     # Break when found .app/Contents/Info.plist
                     for elem in tree.findall("Assets"):
                         for i in  elem.getchildren():
@@ -200,12 +194,12 @@ class CreativeCloudVersioner(Processor):
                                 except:
                                     continue
 
-        # Now we have the deets, let"s use them
+        # Now we have the deets, let's use them
         self.create_pkginfo(app_bundle, app_version, installed_path)
 
 
     def create_pkginfo(self, app_bundle, app_version, installed_path):
-        ''' Create pkginfo will found details '''
+        ''' Create pkginfo with found details '''
         pkginfo = {}
         self.env["version"] = app_version
         self.env["jss_inventory_name"] = app_bundle
