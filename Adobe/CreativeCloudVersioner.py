@@ -35,7 +35,9 @@ __all__ = ["CreativeCloudVersioner"]
 class CreativeCloudVersioner(Processor):
     '''Parses generated CCP installers for detailed application path and bundle
     version info, for use in Munki installs info and JSS application inventory
-    info for Smart Group templates'''
+    info for Smart Group templates. 'version' is used to store the bundle version
+    because the JSS recipe uses app inventory version info for the Smart Group
+    criteria'''
     description = __doc__
     input_variables = {
         "ccpinfo": {
