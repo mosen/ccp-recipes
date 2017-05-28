@@ -217,7 +217,7 @@ class CreativeCloudVersioner(Processor):
             #"CFBundleIdentifier": app_identifier,
             "CFBundleShortVersionString": self.env["version"],
             "path": installed_path,
-            "type": "bundle",
+            "type": "application",
             "version_comparison_key": "CFBundleShortVersionString",
         }]
         self.env["additional_pkginfo"] = pkginfo
