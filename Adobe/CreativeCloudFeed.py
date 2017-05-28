@@ -85,9 +85,6 @@ class CreativeCloudFeed(Processor):
         "icon_url": {
             "description": "Icon download URL for the highest resolution available, normally 96x96."
         },
-        "base_version": {
-            "description": "The basic (major.minor) version"
-        },
         "version": {
             "description": "The full length version"
         },
