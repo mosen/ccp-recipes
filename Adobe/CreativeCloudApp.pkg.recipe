@@ -94,7 +94,7 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                 <key>Arguments</key>
                 <dict>
                     <key>package_name</key>
-                    <string>%NAME%-%version%</string>
+                    <string>%NAME%</string>
                 </dict>
             </dict>
             <dict>
