@@ -265,28 +265,8 @@ It's hoped that in time more titles will move to HD installers, & then these rec
 Once determined that the installer is either a HD or Acrobat Pro installer, the installers Application.json, .pimx & .zip is interogated to extract information detailed below.
 
 #### Input Variables
-- **ccpinfo:**
-    - **default:**
-    - **required:** True
-    - **description:** Creative Cloud Packager Product(s) Information.
 
-- **pkg_path:**
-    - **required:** True
-    - **description:** Path to the built bundle-style CCP installer pkg.
-
-- **uninstaller_pkg_path:**
-    - **required:** True
-    - **description:** Path to the built bundle-style CCP uninstaller pkg.
- 
-- **display_name:**
-    - **required:** True
-    - **description:** The display name of the product, as in the feed e.g. `Photoshop CC (2017)`.
-
-- **minimum_os_version:**
-    - **required:** True
-    - **description:** The minimum OS version required to install the product.
-    
- #### Output Variables
+#### Output Variables
  - **additional_pkginfo:**
      - **description:** Some pkginfo fields extracted from the Adobe metadata, for Munki bundle installs array & Jamf policies.
  

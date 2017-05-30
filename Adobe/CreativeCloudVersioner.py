@@ -40,18 +40,7 @@ class CreativeCloudVersioner(Processor):
     criteria'''
     description = __doc__
     input_variables = {
-        "ccpinfo": {
-            "required": True,
-            "description": "Creative Cloud Packager Product(s) Information",
-        },
-        "pkg_path": {
-            "required": True,
-            "description": "Path to the built bundle-style CCP installer pkg.",
-        },
-        "minimum_os_version": {
-            "required": True,
-            "description": "The minimum operating system version required to install this package"
-        },
+
     }
 
     output_variables = {

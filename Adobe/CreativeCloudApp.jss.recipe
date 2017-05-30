@@ -37,6 +37,17 @@
         <string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
         <key>Process</key>
         <array>
+        	<dict>
+				<key>Processor</key>
+				<string>Copier</string>
+				<key>Arguments</key>
+				<dict>
+					<key>source_path</key>
+					<string>%pkg_path%</string>
+					<key>destination_path</key>
+					<string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.pkg</string>
+				</dict>
+			</dict>
             <dict>
                 <key>Arguments</key>
                 <dict>
@@ -55,6 +66,8 @@
                     </array>
                     <key>jss_inventory_name</key>
 				    <string>%jss_inventory_name%</string>
+				    <key>pkg_path</key>
+				    <string>%destination_path%</string>
                     <key>policy_category</key>
                     <string>%POLICY_CATEGORY%</string>
                     <key>policy_template</key>
@@ -62,13 +75,33 @@
                     <key>prod_name</key>
                     <string>%NAME%</string>
                     <key>self_service_description</key>
-                    <string>%package_info_text%</string>
+                    <string>%release_notes%</string>
                     <key>self_service_icon</key>
                     <string>%icon_path%</string>
                 </dict>
                 <key>Processor</key>
                 <string>JSSImporter</string>
             </dict>
+            <dict>
+                <key>Processor</key>
+            	<string>PathDeleter</string>
+            	<key>Arguments</key>
+            	<dict>
+            		<key>path_list</key>
+            		<string>%destination_path%</string>
+            	</dict>
+            </dict>
+            <dict>
+				<key>Processor</key>
+				<string>Copier</string>
+				<key>Arguments</key>
+				<dict>
+					<key>source_path</key>
+					<string>%uninstaller_pkg_path%</string>
+					<key>destination_path</key>
+					<string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.pkg</string>
+				</dict>
+			</dict>
             <dict>
                 <key>Arguments</key>
                 <dict>
@@ -88,7 +121,7 @@
                     <key>jss_inventory_name</key>
 				    <string>%jss_inventory_name%</string>
 				    <key>pkg_path</key>
-				    <string>%uninstaller_pkg_path%</string>
+				    <string>%destination_path%</string>
                     <key>policy_category</key>
                     <string>%UNINSTALL_POLICY_CATEGORY%</string>
                     <key>policy_template</key>
@@ -100,6 +133,15 @@
                 </dict>
                 <key>Processor</key>
                 <string>JSSImporter</string>
+            </dict>
+            <dict>
+                <key>Processor</key>
+            	<string>PathDeleter</string>
+				<key>Arguments</key>
+            	<dict>
+            		<key>path_list</key>
+            		<string>%destination_path%</string>
+            	</dict>
             </dict>
         </array>
     </dict>
