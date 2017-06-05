@@ -131,6 +131,10 @@ The format of this file is described further in [This Adobe Article](https://hel
 
 - You may see an error if there is a new CCP update pending. You will need to launch CCP manually to perform the update before you can proceed.
 
+## Other links
+
+* [Creative Cloud Desktop App release notes](https://helpx.adobe.com/creative-cloud/release-note/cc-release-notes.html)
+
 ## Processor Reference
 
 ### CreativeCloudFeed
