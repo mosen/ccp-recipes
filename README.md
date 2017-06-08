@@ -95,8 +95,6 @@ Example:
     <true/>
     <key>adminPrivilegesEnabled</key>
     <true/>
-    <key>is64Bit</key>
-    <true/>
     <key>organizationName</key>
     <string>ADMIN_PLEASE_CHANGE</string>
     <key>customerType</key>
