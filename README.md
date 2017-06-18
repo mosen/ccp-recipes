@@ -142,6 +142,8 @@ The format of this file is described further in [This Adobe Article](https://hel
 
 - You may see an error if there is a new CCP update pending. You will need to launch CCP manually to perform the update before you can proceed.
 
+- If you're building packages on a headless Mac, CCP will stall unless a Screen Sharing / ARD observe session is active. As a workaround, you can install a display dongle. [This one](https://www.amazon.com/dp/B00FLZXGJ6/), [recommended by Macminicolo](https://macminicolo.net/blog/files/an-hdmi-adapter-for-a-headless-mac-mini.html) has been confirmed to work with the Mac mini (Late 2012) for this purpose.
+
 ## Other links
 
 * [Creative Cloud Desktop App release notes](https://helpx.adobe.com/creative-cloud/release-note/cc-release-notes.html)
