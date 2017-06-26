@@ -16,7 +16,7 @@ Use the pkg recipe, wrap both the installer and uninstaller in DMGs, and import 
 
 #### jss
 
-Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import and configure the package at a Jamf Pro instance.
+Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import the install & uninstall packages into a Jamf Pro instance, with the required policies created.
 
 ## Getting Started
 
@@ -95,12 +95,12 @@ Example:
     <true/>
     <key>adminPrivilegesEnabled</key>
     <true/>
-    <key>is64Bit</key>
-    <true/>
     <key>organizationName</key>
     <string>ADMIN_PLEASE_CHANGE</string>
+
+    <!-- customerType can be either 'enterprise' or 'team' -->
     <key>customerType</key>
-    <string>team</string>
+    <string>enterprise</string>
     <key>Language</key>
     <string>en_US</string>
     <key>Products</key>
@@ -114,12 +114,23 @@ Example:
             <string>latest</string>
         </dict>
     </array>
+    
+    <!-- Building pre-licensed packages -->
+    <!-- adding 'serialNumber' when an 'enterprise' customerType will build a serialized package -->
+    <key>serialNumber</key>
+    <string>123456781234567812345678</string>
+
+    <!-- adding 'devicePoolName' when a 'team' customerType will build a device-licensed package -->
+    <key>devicePoolName</key>
+    <string>Complete</string>
 </dict>
 ```
 
 Worth noting above is the `version` key, which is set here to `latest` (which is also the default if omitted). This can instead be set to the original base version if you'd like to build that version instead. Currently it does not seem like CCP will allow you to build any additional versions that may be "in between" the original release and the current latest.
 
-As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items.
+As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items. Currently, the support for building packages with multiple products is experimental.
+
+To build serialized or device-licensed packages, set the `serialNumber` or `devicePoolName` keys. If neither of these are present, a Named-licensed package will be built.
 
 The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. 
 The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html)
@@ -131,125 +142,8 @@ The format of this file is described further in [This Adobe Article](https://hel
 
 - You may see an error if there is a new CCP update pending. You will need to launch CCP manually to perform the update before you can proceed.
 
-## Processor Reference
+- If you're building packages on a headless Mac, CCP will stall unless a Screen Sharing / ARD observe session is active. As a workaround, you can install a display dongle. [This one](https://www.amazon.com/dp/B00FLZXGJ6/), [recommended by Macminicolo](https://macminicolo.net/blog/files/an-hdmi-adapter-for-a-headless-mac-mini.html) has been confirmed to work with the Mac mini (Late 2012) for this purpose.
 
-### CreativeCloudFeed
+## Other links
 
-#### Description
-
-Scrapes the product feed and returns product info based on your selected version criteria.
-
-#### Input Variables
-- **product_id:**
-    - **default:** None
-    - **required:** True
-    - **description:** The product SAP code, which can be found by running the `listfeed.py` in this repo.
-
-- **base_version:**
-    - **default:** None
-    - **required:** False
-    - **description:** The base product version. *NOTE:* some packages do not have a base version.
-
-- **version:**
-    - **default:** `latest`
-    - **required:** False
-    - **description:** Either `latest` or a specific product version.
-        Specifying `latest` returns the highest version available for the specified `base_version`
-
-- **channels:**
-    - **default:** `ccm,sti`
-    - **required:** False
-    - **description:** The update feed channel(s), comma separated. Typically you should not need to change this.
-
-- **platforms:**
-    - **default:** `osx10,osx10-64`
-    - **required:** False
-    - **description:** The deployment platform(s), comma separated. Valid values are `osx10`, `osx10-64` (TODO) windows platforms.
-
-#### Output Variables
-- **product_info_url:**
-    - **description:** The generic product landing page.
-
-- **base_version:**
-    - **description:** The base product version that was selected based on your criteria.
-
-- **version:**
-    - **description:** The product version that was selected based on your criteria.
-
-- **display_name:**
-    - **description:** The display name of the product, as in the feed e.g. `Photoshop CC (2017)`.
-
-- **minimum_os_version:**
-    - **description:** The minimum OS version required to install the product.
-
-
-### CreativeCloudPackager
-
-#### Description
-
-Takes information about package(s) and your license information, and builds a package using Creative Cloud Packager.
-
-#### Input Variables
-- **package_name:**
-    - **default:**
-    - **required:** True
-    - **description:** The name of the output package. CCP will add `_Install` and `_Uninstall` suffixes.
-
-- **license_type:**
-    - **default:** (Taken from your CCP Preferences for the most recent login)
-    - **required:** False
-    - **description:** The license type, one of: `enterprise`, `team`. If this is omitted, CCP's preferences for
-    the last logged-in user will be queried and that customer type used here.
-
-- **organization_name:**
-    - **default:** (None)
-    - **required:** True
-    - **description:** The organization name which must match your licensed organization. This can be obtained from either the Enterprise Dashboard (upper right), Team management dashboard (upper left), or by looking in `Contents/Resources/optionXML.xml` of a previously-built package, in the `OrganizationName` element.
-
-- **serial_number:**
-    - **default:** (None)
-    - **required:** False
-    - **description:** The serial number, if you are using serialized packages.  The serial number should expressed without punctuation, rather than the hyphenated format provided by Adobe (i.e. instead of `1111-2222-3333-4444-5555-6666`, use `111122223333444455556666`).
-
-- **language:**
-    - **default:** `en_US`
-    - **required:** False
-    - **description:** The language to build.
-
-- **include_updates:**
-    - **default:** True
-    - **required:** False
-    - **description:** Include all available ride-along updates (such as Camera RAW) to the package(s) specified.
-
-- **rum_enabled:**
-    - **default:** True
-    - **required:** False
-    - **description:** Include RUM in the package.
-
-- **updates_enabled:**
-    - **default:** False
-    - **required:** False
-    - **description:** Allow the end user to perform updates.
-
-- **apps_panel_enabled:**
-    - **default:** True
-    - **required:** False
-    - **description:** Allow the end user to see the Apps panel for app installation and removal.
-
-- **admin_privileges_enabled:**
-    - **default:** False
-    - **required:** False
-    - **description:** Allow the **Creative Cloud** desktop application to run in privileged mode. This allows users to perform installations without being a local administrator.
-
-#### Output Variables
-- **pkg_path:**
-    - **description:** Path to the built bundle-style CCP installer pkg.
-
-- **uninstaller_pkg_path:**
-    - **description:** Path to the built bundle-style CCP uninstaller pkg.
-
-- **package_info_text:**
-    - **description:** Text notes about which packages and updates are included in the pkg.
-
-- **ccp_version:**
-    - **description:** Version of CCP tools used to build the package.
+* [Creative Cloud Desktop App release notes](https://helpx.adobe.com/creative-cloud/release-note/cc-release-notes.html)

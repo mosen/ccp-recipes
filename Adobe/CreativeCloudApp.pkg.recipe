@@ -86,16 +86,20 @@ Other Input values here correspond to options provided in the CCP UI.</string>
             </dict>
             <dict>
                 <key>Processor</key>
-                <string>EndOfCheckPhase</string>
-            </dict>
-            <dict>
-                <key>Processor</key>
                 <string>CreativeCloudPackager</string>
                 <key>Arguments</key>
                 <dict>
                     <key>package_name</key>
                     <string>%NAME%</string>
                 </dict>
+            </dict>
+            <dict>
+                <key>Processor</key>
+                <string>EndOfCheckPhase</string>
+            </dict>
+            <dict>
+                <key>Processor</key>
+                <string>CreativeCloudVersioner</string>
             </dict>
         </array>
     </dict>

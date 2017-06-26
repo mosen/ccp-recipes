@@ -14,12 +14,20 @@
             <string>%NAME%-update-smart</string>
             <key>GROUP_TEMPLATE</key>
             <string>SmartGroupTemplate.xml</string>
-            <key>NAME</key>
-            <string>%display_name%</string>
             <key>POLICY_CATEGORY</key>
             <string>Testing</string>
             <key>POLICY_TEMPLATE</key>
             <string>PolicyTemplate.xml</string>
+            <key>UNINSTALL_CATEGORY</key>
+            <string>Uninstallers</string>
+            <key>UNINSTALL_GROUP_NAME</key>
+            <string>%NAME%-uninstall</string>
+            <key>UNINSTALL_GROUP_TEMPLATE</key>
+            <string>UninstallSmartGroupTemplate.xml</string>
+            <key>UNINSTALL_POLICY_CATEGORY</key>
+            <string>Testing</string>
+            <key>UNINSTALL_POLICY_TEMPLATE</key>
+            <string>UninstallPolicyTemplate.xml</string>
             <key>SELF_SERVICE_ICON</key>
             <string></string>
         </dict>
@@ -29,6 +37,17 @@
         <string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
         <key>Process</key>
         <array>
+        	<dict>
+				<key>Processor</key>
+				<string>Copier</string>
+				<key>Arguments</key>
+				<dict>
+					<key>source_path</key>
+					<string>%pkg_path%</string>
+					<key>destination_path</key>
+					<string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.pkg</string>
+				</dict>
+			</dict>
             <dict>
                 <key>Arguments</key>
                 <dict>
@@ -45,8 +64,10 @@
                             <string>%GROUP_TEMPLATE%</string>
                         </dict>
                     </array>
-                    <key>package_notes</key>
-                    <string>%package_info_text%</string>
+                    <key>jss_inventory_name</key>
+				    <string>%jss_inventory_name%</string>
+				    <key>pkg_path</key>
+				    <string>%destination_path%</string>
                     <key>policy_category</key>
                     <string>%POLICY_CATEGORY%</string>
                     <key>policy_template</key>
@@ -60,6 +81,67 @@
                 </dict>
                 <key>Processor</key>
                 <string>JSSImporter</string>
+            </dict>
+            <dict>
+                <key>Processor</key>
+            	<string>PathDeleter</string>
+            	<key>Arguments</key>
+            	<dict>
+            		<key>path_list</key>
+            		<string>%destination_path%</string>
+            	</dict>
+            </dict>
+            <dict>
+				<key>Processor</key>
+				<string>Copier</string>
+				<key>Arguments</key>
+				<dict>
+					<key>source_path</key>
+					<string>%uninstaller_pkg_path%</string>
+					<key>destination_path</key>
+					<string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.pkg</string>
+				</dict>
+			</dict>
+            <dict>
+                <key>Arguments</key>
+                <dict>
+                    <key>category</key>
+                    <string>%UNINSTALL_CATEGORY%</string>
+                    <key>groups</key>
+                    <array>
+                        <dict>
+                            <key>name</key>
+                            <string>%UNINSTALL_GROUP_NAME%</string>
+                            <key>smart</key>
+                            <true/>
+                            <key>template_path</key>
+                            <string>%UNINSTALL_GROUP_TEMPLATE%</string>
+                        </dict>
+                    </array>
+                    <key>jss_inventory_name</key>
+				    <string>%jss_inventory_name%</string>
+				    <key>pkg_path</key>
+				    <string>%destination_path%</string>
+                    <key>policy_category</key>
+                    <string>%UNINSTALL_POLICY_CATEGORY%</string>
+                    <key>policy_template</key>
+                    <string>%UNINSTALL_POLICY_TEMPLATE%</string>
+                    <key>prod_name</key>
+                    <string>%NAME%</string>
+                    <key>self_service_icon</key>
+                    <string>%icon_path%</string>
+                </dict>
+                <key>Processor</key>
+                <string>JSSImporter</string>
+            </dict>
+            <dict>
+                <key>Processor</key>
+            	<string>PathDeleter</string>
+				<key>Arguments</key>
+            	<dict>
+            		<key>path_list</key>
+            		<string>%destination_path%</string>
+            	</dict>
             </dict>
         </array>
     </dict>
