@@ -45,7 +45,7 @@ CCP_ERROR_MSGS = {
         ("Please check that your organization is of the correct "
          "type, one of ({}).".format(', '.join(CUSTOMER_TYPES))),
     "TronWelcomeInputValidationError": \
-        ("Please check that your ORG_NAME matches one to which your "
+        ("Please check that your organizationName matches one to which your "
          "CCP-signed-in user ""belongs."),
     "TronSerialNumberValidationError": \
         ("Serial number validation failed."),
@@ -267,7 +267,7 @@ class CreativeCloudPackager(Processor):
                  "'/Applications/Utilities/Adobe Creative Cloud'.") % ccda_path)
 
     def main(self):
-        self.check_ccda_installed()
+        # self.check_ccda_installed()
 
         # establish some of our expected build paths
         expected_output_root = os.path.join(self.env["RECIPE_CACHE_DIR"], self.env["package_name"])
