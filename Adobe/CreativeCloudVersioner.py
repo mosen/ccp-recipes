@@ -33,11 +33,11 @@ __all__ = ["CreativeCloudVersioner"]
 
 
 class CreativeCloudVersioner(Processor):
-    '''Parses generated CCP installers for detailed application path and bundle
+    """Parses generated CCP installers for detailed application path and bundle
     version info, for use in Munki installs info and JSS application inventory
     info for Smart Group templates. 'version' is used to store the bundle version
     because the JSS recipe uses app inventory version info for the Smart Group
-    criteria'''
+    criteria"""
     description = __doc__
     input_variables = {
 
@@ -62,9 +62,21 @@ class CreativeCloudVersioner(Processor):
         },
     }
 
-
     def main(self):
-        ''' Read .json & .pimx to .app, then read info.plist'''
+        """
+        Determine a pkginfo, version and jss inventory name from the created package.
+
+        Inputs:
+            ccpinfo: The CCPInfo dict which was included in the original recipe.
+            version: The desired version
+        Outputs:
+            user_facing_version: The version which would be seen in the application's About window.
+            prod: The CCPInfo products dictionary
+            sapCode: The SAP Code of the product
+            ccpVersion:
+            app_json: The path of the Application.json file that CCP produced as part of the build process
+
+        """
         ccpinfo = self.env["ccpinfo"]
         # 'version' contains that which was extracted from the feed, which is
         # actually what we want as a user-facing version, so just grab it
@@ -96,121 +108,123 @@ class CreativeCloudVersioner(Processor):
                 else:
                     self.process_apro_installer()
 
-
     def process_apro_installer(self):
-        ''' Process APRO installer '''
+        """ Process APRO installer """
         self.output("Processing Acrobat installer")
         self.output("proxy_xml: %s" % self.env["proxy_xml"])
         tree = ElementTree.parse(self.env["proxy_xml"])
-        # The below parses the proxy.xml for the info needs to build an installs.
-        # Tried to be verbose in selecting elements, in the hope we don"t trip up
-        for elem in list(tree.iter("Properties")):
-            for sub_elem in elem.getchildren():
-                if sub_elem.attrib["name"].startswith("path"):
-                    app_bundle = re.split("/", sub_elem.text)[1]
-                    self.output("app_bundle: %s" % app_bundle)
+        root = tree.getroot()
 
-        for elem in list(tree.iter("InstallDir")):
-            for sub_elem in elem.getchildren():
-                if sub_elem.text.startswith("[AdobeProgramFiles]"):
-                    app_path = re.split("/", sub_elem.text)[1]
-                    self.output("app_path: %s" % app_path)
+        app_bundle_text = root.findtext("./ThirdPartyComponent/Metadata/Properties/Property[@name='path']")
+        app_bundle = app_bundle_text.split('/')[1]
+        self.output("app_bundle: %s" % app_bundle)
+
+        app_path_text = root.findtext('./InstallDir/Platform')
+        self.output(app_path_text)
+        app_path = app_path_text.split('/')[1]
+        self.output("app_path: %s" % app_path)
 
         installed_path = os.path.join("/Applications", app_path, app_bundle)
         self.output("installed_path: %s" % installed_path)
 
-        for elem in list(tree.iter("InstallerProperties")):
-            for sub_elem in elem.getchildren():
-                if sub_elem.attrib["name"].startswith("ProductVersion"):
-                    app_version = sub_elem.text
-                    self.output("app_version: %s" % app_version)
-
-        #for elem in list(tree.iter("Application")):
-        #    app_identifier = elem.attrib["CFBundleIdentifier"]
-        #    self.output("app_identifier: %s" % app_identifier)
+        app_version = root.findtext('./InstallerProperties/Property[@name="ProductVersion"]')
+        self.output("app_version: %s" % app_version)
 
         # Now we have the deets, let"s use them
         self.create_pkginfo(app_bundle, app_version, installed_path)
 
-
     def process_hd_installer(self):
-        ''' Process HD installer '''
+        """Process HD installer
+
+        Inputs:
+              app_json: Path to the Application JSON that was extracted from the feed.
+        """
         self.output("Processing HD installer")
         with open(self.env["app_json"]) as json_file:
             load_json = json.load(json_file)
+
             # AppLaunch is not always in the same format, but is splittable
-            app_launch = load_json["AppLaunch"]
-            self.output("app_launch: %s" % app_launch)
-            app_details = list(re.split("/", app_launch))
-            if app_details[2].endswith(".app"):
-                app_bundle = app_details[2]
-                app_path = app_details[1]
-            else:
-                app_bundle = app_details[1]
-                app_path = list(re.split("/", (load_json["InstallDir"]["value"])))[1]
-            self.output("app_bundle: %s" % app_bundle)
-            self.output("app_path: %s" % app_path)
+            if 'AppLaunch' in load_json:  # Bridge CC is HD but does not have AppLaunch
+                app_launch = load_json["AppLaunch"]
+                self.output("app_launch: %s" % app_launch)
+                app_details = list(re.split("/", app_launch))
+                if app_details[2].endswith(".app"):
+                    app_bundle = app_details[2]
+                    app_path = app_details[1]
+                else:
+                    app_bundle = app_details[1]
+                    app_path = list(re.split("/", (load_json["InstallDir"]["value"])))[1]
+                self.output("app_bundle: %s" % app_bundle)
+                self.output("app_path: %s" % app_path)
 
-            installed_path = os.path.join("/Applications", app_path, app_bundle)
-            self.output("installed_path: %s" % installed_path)
-            zip_file = load_json["Packages"]["Package"][0]["PackageName"]
-            self.output("zip_file: %s" % zip_file)
+                installed_path = os.path.join("/Applications", app_path, app_bundle)
+                self.output("installed_path: %s" % installed_path)
 
-            zip_path = os.path.join(self.env["pkg_path"], "Contents/Resources/HD", self.env["sapCode"] + self.env["ccpVersion"], zip_file + ".zip")
-            self.output("zip_path: %s" % zip_path)
-            with zipfile.ZipFile(zip_path, mode="r") as myzip:
-                with myzip.open(zip_file + ".pimx") as mytxt:
-                    txt = mytxt.read()
-                    tree = ElementTree.fromstring(txt)
-                    # Loop through .pmx's Assets, look for target=[INSTALLDIR], then grab Assets Source.
-                    # Break when found .app/Contents/Info.plist
-                    for elem in tree.findall("Assets"):
-                        for i in  elem.getchildren():
-                            if i.attrib["target"].upper().startswith("[INSTALLDIR]"):
-                                bundle_location = i.attrib["source"]
-                            else:
-                                continue
-                            if not bundle_location.startswith("[StagingFolder]"):
-                                continue
-                            else:
-                                bundle_location = bundle_location[16:]
-                                if bundle_location.endswith(".app"):
-                                    zip_bundle = os.path.join("1", bundle_location, "Contents/Info.plist")
+                zip_file = load_json["Packages"]["Package"][0]["PackageName"]
+                self.output("zip_file: %s" % zip_file)
+
+                zip_path = os.path.join(self.env["pkg_path"], "Contents/Resources/HD", self.env["sapCode"] + self.env["ccpVersion"], zip_file + ".zip")
+                self.output("zip_path: %s" % zip_path)
+                with zipfile.ZipFile(zip_path, mode="r") as myzip:
+                    with myzip.open(zip_file + ".pimx") as mytxt:
+                        txt = mytxt.read()
+                        tree = ElementTree.fromstring(txt)
+                        # Loop through .pmx's Assets, look for target=[INSTALLDIR], then grab Assets Source.
+                        # Break when found .app/Contents/Info.plist
+                        for elem in tree.findall("Assets"):
+                            for i in  elem.getchildren():
+                                if i.attrib["target"].upper().startswith("[INSTALLDIR]"):
+                                    bundle_location = i.attrib["source"]
                                 else:
-                                    zip_bundle = os.path.join("1", bundle_location, app_bundle, "Contents/Info.plist")
-                                try:
-                                    with myzip.open(zip_bundle) as myplist:
-                                        plist = myplist.read()
-                                        data = FoundationPlist.readPlistFromString(plist)
-                                        app_version = data["CFBundleShortVersionString"]
-                                        #app_identifier = data["CFBundleIdentifier"]
-                                        self.output("staging_folder: %s" % bundle_location)
-                                        self.output("staging_folder_path: %s" % zip_bundle)
-                                        self.output("app_version: %s" % app_version)
-                                        self.output("app_bundle: %s" % app_bundle)
-                                        #self.output("app_identifier: %s" % app_identifier)
-                                        break
-                                except:
                                     continue
+                                if not bundle_location.startswith("[StagingFolder]"):
+                                    continue
+                                else:
+                                    bundle_location = bundle_location[16:]
+                                    if bundle_location.endswith(".app"):
+                                        zip_bundle = os.path.join("1", bundle_location, "Contents/Info.plist")
+                                    else:
+                                        zip_bundle = os.path.join("1", bundle_location, app_bundle, "Contents/Info.plist")
+                                    try:
+                                        with myzip.open(zip_bundle) as myplist:
+                                            plist = myplist.read()
+                                            data = FoundationPlist.readPlistFromString(plist)
+                                            app_version = data["CFBundleShortVersionString"]
+                                            #app_identifier = data["CFBundleIdentifier"]
+                                            self.output("staging_folder: %s" % bundle_location)
+                                            self.output("staging_folder_path: %s" % zip_bundle)
+                                            self.output("app_version: %s" % app_version)
+                                            self.output("app_bundle: %s" % app_bundle)
+                                            #self.output("app_identifier: %s" % app_identifier)
+                                            break
+                                    except:
+                                        continue
 
-        # Now we have the deets, let's use them
-        self.create_pkginfo(app_bundle, app_version, installed_path)
-
+                # Now we have the deets, let's use them
+                self.create_pkginfo(app_bundle, app_version, installed_path)
 
     def create_pkginfo(self, app_bundle, app_version, installed_path):
-        ''' Create pkginfo with found details '''
-        pkginfo = {}
+        """Create pkginfo with found details
+
+        Args:
+              app_bundle (str): Bundle name
+              app_version (str): Bundle version
+              installed_path (str): The path where the installed item will be installed.
+        """
         self.env["version"] = app_version
         self.env["jss_inventory_name"] = app_bundle
-        pkginfo["display_name"] = self.env["display_name"]
-        pkginfo["minimum_os_version"] = self.env["minimum_os_version"]
-        pkginfo["installs"] = [{
-            #"CFBundleIdentifier": app_identifier,
-            "CFBundleShortVersionString": self.env["version"],
-            "path": installed_path,
-            "type": "application",
-            "version_comparison_key": "CFBundleShortVersionString",
-        }]
+        
+        pkginfo = {
+            'display_name': self.env["display_name"],
+            'minimum_os_version': self.env["minimum_os_version"],
+            'installs': [{
+                'CFBundleShortVersionString': self.env['version'],
+                'path': installed_path,
+                'type': 'application',
+                'version_comparison_key': 'CFBundleShortVersionString',
+            }]
+        }
+
         self.env["additional_pkginfo"] = pkginfo
         self.output("additional_pkginfo: %s" % self.env["additional_pkginfo"])
 

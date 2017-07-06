@@ -8,8 +8,6 @@
         <dict>
             <key>NAME</key>
             <string>AdobeAcrobatDC</string>
-            <key>ORG_NAME</key>
-            <string>ADMIN_PLEASE_CHANGE</string>
             <key>ccpinfo</key>
             <dict>
                 <key>matchOSLanguage</key>
