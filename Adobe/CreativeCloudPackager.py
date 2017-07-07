@@ -267,7 +267,7 @@ class CreativeCloudPackager(Processor):
                  "'/Applications/Utilities/Adobe Creative Cloud'.") % ccda_path)
 
     def main(self):
-        if not self.env["ALLOW_CCDA_INSTALLED"] == "1":
+        if self.env.get("ALLOW_CCDA_INSTALLED", False):
             self.check_ccda_installed()
 
         # establish some of our expected build paths
