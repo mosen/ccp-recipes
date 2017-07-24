@@ -4,17 +4,17 @@ AutoPkg recipes for Creative Cloud Packager workflows
 
 ## Overview
 
-These processors and recipes may be used to automate the creation of Adobe Creative Cloud Packager (CCP) packages, using Adobe's provided [automation](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html) support. Currently there are three flavors of `CreativeCloudApp` recipes provided:
+These processors and recipes may be used to automate the creation of Adobe Creative Cloud Packager (CCP) packages, using Adobe's provided [automation](https://helpx.adobe.com/enterprise/package/help/ccp-automation.html) support. Currently there are three flavors of `CreativeCloudApp` recipes provided:
 
-#### pkg
+### pkg
 
 Uses CCP to build a package saved to disk, exactly as one would using the CCP GUI application.
 
-#### munki
+### munki
 
-Use the pkg recipe, wrap both the installer and uninstaller in DMGs, and import these to a Munki repo.
+Use the pkg recipe, create DMGs from both the installers and uninstallers, and import these to a Munki repo.
 
-#### jss
+### jss
 
 Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSImporter) processor to import the install & uninstall packages into a Jamf Pro instance, with the required policies created.
 
@@ -26,8 +26,8 @@ Use the pkg recipe, and use the [JSSImporter](https://github.com/sheagcraig/JSSI
 * [Adobe Creative Cloud Packager (CCP) for macOS](https://www.adobe.com/go/ccp_installer_osx)
 * An Adobe ID which is able to sign into either the [Teams](https://adminconsole.adobe.com/team) or [Enterprise](https://adminconsole.adobe.com/enterprise) dashboards and has the ability to build packages (for Enterprise this is at least the [Deployment Admin](https://helpx.adobe.com/enterprise/help/admin-roles.html) role)
 * You must run CCP once manually in order to sign in as the account/organization you will be using to create further packages.
-* This recipe repo must be added to AutoPkg.
-* There must be no other Adobe CC applications or the Creative Cloud application installed on the machine building packages.
+* This recipe repo must be added to AutoPkg
+* There must be no other Adobe CC applications or the Creative Cloud application installed on the machine building packages
 
 ### Verifying your login
 
@@ -35,26 +35,25 @@ First log into the CCP with your username and verify that you're able to select 
 
 ### Determining your organization name
 
-The CCP automation support requires us to specify the actual full name of the organization to which the user belongs as part of the initial authentication to build packages. There is a script in this repo, `whats_my_org.sh`, which will attempt to scrape the organization name from the most recent login from the CCP application logs. If this fails, you can determine the organization name by looking in the upper-left in the [Teams](https://adminconsole.adobe.com/team) dashboard or the upper-right in the [Enterprise](https://adminconsole.adobe.com/enterprise) dashboard.
+The CCP automation support requires us to specify the actual full name of the organization to which the user belongs as part of the initial authentication to build packages. There is a script in this repo, `Adobe/whats_my_org.sh`, which will attempt to scrape the organization name from the most recent login from the CCP application logs. If this fails, you can determine the organization name by looking in the upper-left in the [Teams](https://adminconsole.adobe.com/team) dashboard or the upper-right in the [Enterprise](https://adminconsole.adobe.com/enterprise) dashboard.
+
+As stated in the prerequisites, your user must have sufficient privileges to build packages. 
 
 ### Creating the overrides
 
-As a rule, this repository does not contain recipes for each individual product, because each organization will require different things.
-There are some examples provided however.
+This repository does not contain separate recipes for each individual CC application, but instead provides a generic `CreativeCloudApp` recipe with `pkg`, `munki` and `jss` versions, which are meant to be overridden with specific package configurations. Typically one would create an override per application. There are a few [examples](/Adobe/examples) provided.
 
-As an example, we will be creating an override recipe for Photoshop CC 2017.
+As a simple example: creating our own Photoshop CC 2017 package by overriding `CreativeCloudApp.pkg`:
 
-In Terminal, run:
-
-    autopkg make-override -n PhotoshopCC2017.pkg CreativeCloudApp.pkg
-
-AutoPkg will create an override file in your RecipeOverrides folder. Edit the resulting file with a text editor of your choice.
+```
+autopkg make-override --name PhotoshopCC2017.pkg CreativeCloudApp.pkg
+```
 
 The minimum amount of information you need to put in the override is:
 
-- **Your organization name**: The name described above in 'Determining your organization name'
+- **Your organization name**: The name described above in [Determining your organization name](#determining-your-organization-name)
 
-- **An application SAP code**: This is a 3-4 letter code which you can find by running the `listfeed.py` script in this repo. Every application and any related update has an SAP code.
+- **An application SAP code**: This is a 3-4 letter code which you can find by running the `Adobe/listfeed.py` script in this repo. Every application and any related update has an SAP code.
 
 - **A base version**: The base version defines the major version for a given application. The base version and the SAP code, together, uniquely identify any Adobe application.
 
@@ -130,15 +129,13 @@ Worth noting above is the `version` key, which is set here to `latest` (which is
 
 As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items. Currently, the support for building packages with multiple products is experimental.
 
-To build serialized or device-licensed packages, set the `serialNumber` or `devicePoolName` keys. If neither of these are present, a Named-licensed package will be built.
+To build serialized or device-licensed packages, set the `serialNumber` or `devicePoolName` keys, respectively. If neither of these are present, a Named-licensed package will be built.
 
-The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. 
-The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/creative-cloud/packager/ccp-automation.html)
+The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/enterprise/package/help/ccp-automation.html)
 
 ## Troubleshooting
 
-- Most CCP related errors will return a validation error, even though they may be completely unrelated to validation. 
-    You should check the PDApp.log file to get to the real cause of the problem.
+- Most CCP related errors will return a validation error, even though they may be completely unrelated to validation. You should check the PDApp.log file to get to the real cause of the problem.
 
 - You may see an error if there is a new CCP update pending. You will need to launch CCP manually to perform the update before you can proceed.
 
