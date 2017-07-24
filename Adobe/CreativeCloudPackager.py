@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright 2016 Mosen/Tim Sutton
+# Copyright 2016-2017 Mosen/Tim Sutton
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -100,6 +100,9 @@ class CreativeCloudPackager(Processor):
         },
         "ccp_version": {
             "description": "Version of CCP tools used to build the package."
+        },
+        "creative_cloud_packager_summary_result": {
+            "description": "Description of interesting results."
         },
     }
 
@@ -392,6 +395,21 @@ class CreativeCloudPackager(Processor):
                 "WARNING: Didn't find expected 'prodVersion' key (CCP "
                 "version) in optionXML.xml")
         self.env["ccp_version"] = ccp_version.text
+
+        if len(self.env['ccpinfo']['Products']) == 1:
+            built_products = self.env['ccpinfo']['Products'][0]['sapCode']
+        else:
+            built_products = '(multiple)'
+        self.env["creative_cloud_packager_summary_result"] = {
+            'summary_text': 'The following CCP packages were built:',
+            'report_fields': ['display_name', 'product_id', 'version', 'pkg_path'],
+            'data': {
+                'display_name': self.env['display_name'],
+                'product_id': built_products,
+                'version': self.env['version'],
+                'pkg_path': self.env['pkg_path'],
+            }
+        }
 
 if __name__ == "__main__":
     processor = CreativeCloudPackager()
