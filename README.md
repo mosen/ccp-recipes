@@ -113,25 +113,46 @@ Example:
             <string>latest</string>
         </dict>
     </array>
-    
-    <!-- Building pre-licensed packages -->
-    <!-- adding 'serialNumber' when an 'enterprise' customerType will build a serialized package -->
-    <key>serialNumber</key>
-    <string>123456781234567812345678</string>
-
-    <!-- adding 'devicePoolName' when a 'team' customerType will build a device-licensed package -->
-    <key>devicePoolName</key>
-    <string>Complete</string>
 </dict>
 ```
 
 Worth noting above is the `version` key, which is set here to `latest` (which is also the default if omitted). This can instead be set to the original base version if you'd like to build that version instead. Currently it does not seem like CCP will allow you to build any additional versions that may be "in between" the original release and the current latest.
 
-As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items. Currently, the support for building packages with multiple products is experimental.
+As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items.
 
-To build serialized or device-licensed packages, set the `serialNumber` or `devicePoolName` keys, respectively. If neither of these are present, a Named-licensed package will be built.
+**Note:** Currently, the support for building packages with multiple products is experimental.
 
-The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/enterprise/package/help/ccp-automation.html)
+#### Serialized and device-licensed packages
+
+To build serialized or device-licensed packages, set either the `serialNumber` or `devicePoolName` keys, respectively. If neither of these are present, a Named-licensed package will be built.
+
+For example, to build a serialized package, you would just add `serialNumber` to the other items in the `ccpinfo` dict:
+
+```plist
+<key>ccpinfo</key>
+<dict>
+    < !-- other ccpinfo items here -->
+    <key>serialNumber</key>
+    <string>123456781234567812345678</string>
+</dict>
+```
+
+Similarly, for a device-licensed package for a license pool called 'Complete':
+
+```plist
+<key>ccpinfo</key>
+<dict>
+    < !-- other ccpinfo items here -->
+    <key>devicePoolName</key>
+    <string>Complete</string>
+</dict>
+```
+
+
+The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/enterprise/package/help/ccp-automation.html).
+
+
+
 
 ## Troubleshooting
 
