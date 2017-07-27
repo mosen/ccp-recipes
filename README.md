@@ -75,11 +75,11 @@ The minimum amount of information you need to put in the override is:
 
 ### The ccpinfo Input
 
-The only input is **ccpinfo** which describes how your package should be built and what is included.
+The only input is **ccpinfo** which describes how your package should be built and what is included. The names of items in the `ccpinfo` dict mirrors those expected by the Creative Cloud Packager Automation XML file. The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/enterprise/package/help/ccp-automation.html), but everything you would need to set is described below.
 
-You must have at least an **organizationName**, **sapCode** and some version information.
+You must have at least an `organizationName`, and a `Products` which describes specific version information.
 
-Example:
+Example for a Photoshop CC 2017 package:
 
 ```plist
 <key>ccpinfo</key>
@@ -116,7 +116,7 @@ Example:
 </dict>
 ```
 
-Worth noting above is the `version` key, which is set here to `latest` (which is also the default if omitted). This can instead be set to the original base version if you'd like to build that version instead. Currently it does not seem like CCP will allow you to build any additional versions that may be "in between" the original release and the current latest.
+Worth noting above is the `version` key, which is set here to `latest` (which is also the default if omitted). This can instead be set to the original base version if you'd like to build that version instead. Currently it does not seem like CCP will allow you to build any additional versions that may be "in between" the original release and the current latest. The `baseVersion` defined here was derived from the `Adobe/listfeed.py` script demonstrated above.
 
 As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items.
 
@@ -149,7 +149,6 @@ Similarly, for a device-licensed package for a license pool called 'Complete':
 ```
 
 
-The ccpinfo dict mirrors the format of the Creative Cloud Packager Automation XML file. The format of this file is described further in [This Adobe Article](https://helpx.adobe.com/enterprise/package/help/ccp-automation.html).
 
 
 
