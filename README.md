@@ -137,18 +137,20 @@ For example, to build a serialized package, you would just add `serialNumber` to
 </dict>
 ```
 
-Similarly, for a device-licensed package for a license pool called 'Complete':
+Similarly, for a device-licensed package for a license pool called 'Creative Cloud All Apps':
 
 ```plist
 <key>ccpinfo</key>
 <dict>
     < !-- other ccpinfo items here -->
     <key>devicePoolName</key>
-    <string>Complete</string>
+    <string>Creative Cloud All Apps</string>
 </dict>
 ```
 
+#### Case-sensitivity
 
+`organizationName` and `devicePoolName`, and any other keys used for the `ccpinfo` dictionary are case-sensitive, and should match what you see in the CCP user interface.
 
 
 
