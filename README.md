@@ -35,7 +35,7 @@ First log into the CCP with your username and verify that you're able to select 
 
 ### Determining your organization name
 
-The CCP automation support requires us to specify the actual full name of the organization to which the user belongs as part of the initial authentication to build packages. There is a script in this repo, `Adobe/whats_my_org.sh`, which will attempt to scrape the organization name from the most recent login from the CCP application logs. If this fails, you can determine the organization name by looking in the upper-left in the [Teams](https://adminconsole.adobe.com/team) dashboard or the upper-right in the [Enterprise](https://adminconsole.adobe.com/enterprise) dashboard.
+The CCP automation support requires us to specify the actual full name of the organization to which the user belongs as part of the initial authentication to build packages. There is a script in this repo, `whats_my_org.sh`, which will attempt to scrape the organization name from the most recent login from the CCP application logs. If this fails, you can determine the organization name by looking in the upper-left in the [Teams](https://adminconsole.adobe.com/team) dashboard or the upper-right in the [Enterprise](https://adminconsole.adobe.com/enterprise) dashboard.
 
 As stated in the prerequisites, your user must have sufficient privileges to build packages. 
 
@@ -53,7 +53,7 @@ The minimum amount of information you need to put in the override is:
 
 - **Your organization name**: The name described above in [Determining your organization name](#determining-your-organization-name)
 
-- **An application SAP code**: This is a 3-4 letter code which you can find by running the `Adobe/listfeed.py` script in this repo. Every application and any related update has an SAP code.
+- **An application SAP code**: This is a 3-4 letter code which you can find by running the `listfeed.py` script in this repo. Every application and any related update has an SAP code.
 
 - **A base version**: The base version defines the major version for a given application. The base version and the SAP code, together, uniquely identify any Adobe application.
 
@@ -116,7 +116,7 @@ Example for a Photoshop CC 2017 package:
 </dict>
 ```
 
-Worth noting above is the `version` key, which is set here to `latest` (which is also the default if omitted). This can instead be set to the original base version if you'd like to build that version instead. Currently it does not seem like CCP will allow you to build any additional versions that may be "in between" the original release and the current latest. The `baseVersion` defined here was derived from the `Adobe/listfeed.py` script demonstrated above.
+Worth noting above is the `version` key, which is set here to `latest` (which is also the default if omitted). This can instead be set to the original base version if you'd like to build that version instead. Currently it does not seem like CCP will allow you to build any additional versions that may be "in between" the original release and the current latest. The `baseVersion` defined here was derived from the `listfeed.py` script demonstrated above.
 
 As `Products` is an array, multiple applications or included updates may also be included in a single package. It's not recommended to _deploy_ multiple applications via a single package, however, so child recipes (i.e. `.munki`) that try to import packages with multiple products may have undefined behaviour. This capability exists for cases where one wants to build a "collection" package with multiple items.
 
