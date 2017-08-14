@@ -3,13 +3,11 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.pkg.Adobe.PreviewCC</string>
+        <string>local.pkg.AdobePhotoshopCC2017</string>
         <key>Input</key>
         <dict>
             <key>NAME</key>
-            <string>AdobePreviewCC</string>
-            <key>ORG_NAME</key>
-            <string>ADMIN_PLEASE_CHANGE</string>
+            <string>AdobePhotoshopCC2017</string>
             <key>ccpinfo</key>
             <dict>
                 <key>matchOSLanguage</key>
@@ -22,23 +20,19 @@
                 <true/>
                 <key>adminPrivilegesEnabled</key>
                 <true/>
-                <key>IncludeUpdates</key>
-                <true/>
-                <key>is64Bit</key>
-                <true/>
                 <key>organizationName</key>
                 <string>ADMIN_PLEASE_CHANGE</string>
                 <key>customerType</key>
-                <string>team</string>
+                <string>enterprise</string>
                 <key>Language</key>
                 <string>en_US</string>
                 <key>Products</key>
                 <array>
                     <dict>
                         <key>sapCode</key>
-                        <string>PSTI</string>
+                        <string>PHSP</string>
                         <key>baseVersion</key>
-                        <string></string>
+                        <string>18.0</string>
                         <key>version</key>
                         <string>latest</string>
                     </dict>

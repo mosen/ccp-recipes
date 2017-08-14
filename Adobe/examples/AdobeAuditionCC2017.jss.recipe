@@ -3,13 +3,12 @@
 <plist version="1.0">
     <dict>
         <key>Identifier</key>
-        <string>local.munki.Adobe.Fonts</string>
+        <string>local.jss.AdobeAuditionCC2017</string>
         <key>Input</key>
         <dict>
+            <!-- CreativeCloudApp -->
             <key>NAME</key>
-            <string>AdobeFonts</string>
-            <key>ORG_NAME</key>
-            <string>ADMIN_PLEASE_CHANGE</string>
+            <string>AdobeAuditionCC2017</string>
             <key>ccpinfo</key>
             <dict>
                 <key>matchOSLanguage</key>
@@ -22,10 +21,6 @@
                 <true/>
                 <key>adminPrivilegesEnabled</key>
                 <true/>
-                <key>IncludeUpdates</key>
-                <true/>
-                <key>is64Bit</key>
-                <true/>
                 <key>organizationName</key>
                 <string>ADMIN_PLEASE_CHANGE</string>
                 <key>customerType</key>
@@ -36,36 +31,33 @@
                 <array>
                     <dict>
                         <key>sapCode</key>
-                        <string>KFNT</string>
+                        <string>AUDT</string>
                         <key>baseVersion</key>
-                        <string></string>
+                        <string>10.0.0</string>
                         <key>version</key>
                         <string>latest</string>
                     </dict>
                 </array>
             </dict>
-
-            <key>parse_proxy_xml</key>
+            
+            <key>fetch_description</key>
+            <true/>
+            <key>fetch_icon</key>
             <true/>
 
-            <key>MUNKI_REPO_SUBDIR</key>
-            <string>apps/Adobe</string>
-            <key>pkginfo</key>
-            <dict>
-                <key>blocking_applications</key>
-                <array>
-                </array>
-                <key>catalogs</key>
-                <array>
-                    <string>testing</string>
-                </array>
-                <key>name</key>
-                <string>%NAME%</string>
-                <key>unattended_install</key>
-                <true/>
-            </dict>
+            <!-- JSSImporter -->
+            <key>CATEGORY</key>
+            <string>Sound</string>
+            <key>GROUP_NAME</key>
+            <string>%NAME%-update-smart</string>
+            <key>GROUP_TEMPLATE</key>
+            <string>SmartGroupTemplate.xml</string>
+            <key>POLICY_CATEGORY</key>
+            <string>Testing</string>
+            <key>POLICY_TEMPLATE</key>
+            <string>PolicyTemplate.xml</string>
         </dict>
         <key>ParentRecipe</key>
-        <string>com.github.mosen.munki.Adobe.CreativeCloudAppNoUninstall</string>
+        <string>com.github.mosen.jss.Adobe.CreativeCloudApp</string>
     </dict>
 </plist>

@@ -20,10 +20,6 @@
                 <true/>
                 <key>adminPrivilegesEnabled</key>
                 <true/>
-                <key>IncludeUpdates</key>
-                <true/>
-                <key>is64Bit</key>
-                <true/>
                 <key>organizationName</key>
                 <string>ADMIN_PLEASE_CHANGE</string>
                 <key>customerType</key>
@@ -42,10 +38,6 @@
                     </dict>
                 </array>
             </dict>
-
-            <key>parse_proxy_xml</key>
-            <true/>
-
             <key>MUNKI_REPO_SUBDIR</key>
             <string>apps/Adobe</string>
             <key>pkginfo</key>
