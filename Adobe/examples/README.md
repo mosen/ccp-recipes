@@ -1,24 +1,8 @@
-# Examples #
+# Examples
 
-This directory contains example overrides for Adobe products.
-You can copy these to your RecipeOverrides directory to get started.
+This directory contains some example overrides. Since it's possible these may drift over time, these should be considered only as illustrative - creating overrides should always be done using `autopkg make-override --name <override name> <recipe name>`
 
-You can perform some basic testing by overriding these overrides by
-supplying the required `ORG_NAME` variable on the command line eg:
-
-    $ autopkg run -k ORG_NAME="my org" ./AcrobatDC.pkg
-
-*WARNING:* There is no guarantee that this list of recipes is complete.
-
-## Currently Failing ##
-
-- Experience Design
-- Lightroom minor version will be incorrect due to patches not detected (RIBS).
-- Preview CC never creates an Uninstall pkg
-- Gaming SDK version does not include x.x.y version
-- Extension Manager CC does not include x.x.y version
-
-### JSS ###
+### Known issues in JSS recipes
 
 - No SS Icons
 - No SS Description
@@ -26,5 +10,3 @@ supplying the required `ORG_NAME` variable on the command line eg:
 - Acrobat DC Smart Group Version does not match Installed Application version.
 - Version string comparison might end up scoping computers for a downgrade if two package smartgroups exist.
 - Error in local.jss.Adobe.IllustratorCC: Processor: JSSImporter: Error: Central directory offset would require ZIP64 extensions
-
-
