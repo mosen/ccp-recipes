@@ -68,7 +68,7 @@ The minimum amount of information you need to put in the override is:
 		Photoshop CC (2017)         BaseVersion: 18.0       Version: 18.0
 		Photoshop CC (2017)         BaseVersion: 18.0       Version: 18.0.1
 		Photoshop CC (2017)         BaseVersion: 18.0       Version: 18.1
-        Photoshop CC (2017)			BaseVersion: 18.0		Version: 18.1.1
+		Photoshop CC (2017)         BaseVersion: 18.0       Version: 18.1.1
     ```
 	
 	Notice how `BaseVersion` changes only with a major marketing version number change. Some products use `BaseVersion` values like `18.0`, others like `14.0.0`. Take care to specify these values exactly as they appear in the output of `list_ccp_feed`.
