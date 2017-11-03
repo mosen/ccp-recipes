@@ -48,8 +48,8 @@ class CreativeCloudFeed(Processor):
         },
         "channels": {
             "required": False,
-            "default": "ccm,sti",
-            "description": "The update feed channel(s), comma separated. (default is the ccm and sti channels)",
+            "default": "ccp_hd_2,sti",
+            "description": "The update feed channel(s), comma separated. (default is the ccp_hd_2 and sti channels)",
         },
         "platforms": {
             "required": False,
