@@ -49,7 +49,7 @@ class CreativeCloudFeed(Processor):
         "channels": {
             "required": False,
             "default": "ccp_hd_2,sti",
-            "description": "The update feed channel(s), comma separated. (default is the ccp_hd_2 and sti channels)",
+            "description": "The update feed channel(s), comma separated. (default is the ccp_hd_2 and sti channels). The first channel will be used to fetch application info",
         },
         "platforms": {
             "required": False,
@@ -240,6 +240,7 @@ class CreativeCloudFeed(Processor):
         """Fetch extended information about a product such as: manifest,
         proxy (if available), release notes, and icon"""
         extended_info = {}
+        channels = string.split(self.env.get('channels'), ',')
 
         # Fetch Icon
         if 'productIcons' in product:
@@ -270,7 +271,7 @@ class CreativeCloudFeed(Processor):
         # Fetch Manifest + Proxy
         if 'urls' in platform['languageSet'][0] and 'manifestURL' in platform['languageSet'][0]['urls']:
             extended_info['manifest_url'] = '{}{}'.format(
-                cdn['ccm']['secure'],
+                cdn[channels[0]]['secure'],
                 platform['languageSet'][0]['urls'].get('manifestURL')
             )
 
