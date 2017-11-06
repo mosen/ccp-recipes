@@ -54,7 +54,7 @@ ACC_PACKAGE_SETS = {
 }
 
 
-class CreativeCloudBuildModifier(Processor):
+class CreativeCloudBuildModifier:
     """This processor parses the output of the CCP build process and makes modifications."""
     description = __doc__
     input_variables = {
