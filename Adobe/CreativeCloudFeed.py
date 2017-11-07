@@ -292,7 +292,7 @@ class CreativeCloudFeed(Processor):
             self.output('Did not find a manifest.xml in the product json data')
 
         # Fetch Release Notes
-        if self.env.get('fetch_release_notes', False):
+        if self.env.get('fetch_release_notes', 'false').lower() == 'true':
             self.output('Processor will fetch update release notes')
             desc = self.fetch_release_notes(product['id'], product['version'], 'osx10-64', 'en_US')
             rn_etree = ElementTree.fromstring(desc)
