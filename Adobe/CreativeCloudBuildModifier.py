@@ -130,8 +130,8 @@ class CreativeCloudBuildModifier(Processor):
         if self.env.get('suppress_ccda', False):
             modified_root = self._suppressCcda(root)
 
-            with open(option_xml_path, 'w+') as fd:
-                fd.write(ElementTree.dump(modified_root))
+            with open(option_xml_path, 'wb') as fd:
+                fd.write(ElementTree.tostring(modified_root))
 
             self.output('OptionXML modified')
 
