@@ -227,9 +227,7 @@ class CreativeCloudVersioner(Processor):
         # if not os.path.exists(media_path):
         #     raise ProcessorError('Could not find Media for RIBS package in path: {}'.format(media_path))
 
-        self.env['version'] = main_media.findtext('prodVersion')
-
-
+        self.create_pkginfo('NOT_SUPPORTED', main_media.findtext('prodVersion'), '')
 
     def create_pkginfo(self, app_bundle, app_version, installed_path):
         """Create pkginfo with found details
