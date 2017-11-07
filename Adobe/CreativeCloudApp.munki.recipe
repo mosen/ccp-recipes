@@ -80,6 +80,8 @@
 					<dict>
 						<key>version</key>
 						<string>%user_facing_version%</string>
+                        <key>description</key>
+                        <string>%release_notes%</string>
 					</dict>
 				</dict>
             </dict>
