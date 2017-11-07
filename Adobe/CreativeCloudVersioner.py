@@ -215,7 +215,7 @@ class CreativeCloudVersioner(Processor):
 
         option_xml = ElementTree.parse(option_xml_path)
         main_media = None
-        for media in option_xml.iter('.//Medias/Media'):  # Media refers to RIBS media only. HD is in HDMedia
+        for media in option_xml.findall('.//Medias/Media'):  # Media refers to RIBS media only. HD is in HDMedia
             if media.findtext('SAPCode') == sap_code_hint:
                 main_media = media
                 break
