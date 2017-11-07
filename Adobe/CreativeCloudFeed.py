@@ -265,7 +265,7 @@ class CreativeCloudFeed(Processor):
 
             extended_info['icon_path'] = '{}/Icon.png'.format(self.env['RECIPE_CACHE_DIR'])
         else:
-            self.output('An icon was requested but we were unable to download one.')
+            self.output('An icon was not requested or the url did not exist.')
             extended_info['icon_path'] = ''
 
         # Fetch Manifest + Proxy
