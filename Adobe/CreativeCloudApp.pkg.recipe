@@ -30,6 +30,8 @@ Other Input values here correspond to options provided in the CCP UI.</string>
             <string>CreativeCloudApp</string>
             <key>FETCH_ICON</key>
             <string>false</string>
+            <key>FETCH_RELEASE_NOTES</key>
+            <string>false</string>
             <key>ccpinfo</key>
             <dict>
                 <!-- Boolean flags -->
@@ -89,6 +91,8 @@ Other Input values here correspond to options provided in the CCP UI.</string>
                 <dict>
                     <key>fetch_icon</key>
                     <string>%FETCH_ICON%</string>
+                    <key>fetch_release_notes</key>
+                    <string>%FETCH_RELEASE_NOTES%</string>
                 </dict>
             </dict>
             <dict>

@@ -38,6 +38,7 @@ UPDATE_DESC_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/co
 UPDATE_FEED_URL_MAC = 'https://swupmf.adobe.com/webfeed/oobe/aam20/mac/updaterfeed.xml'
 HEADERS = {'User-Agent': 'Creative Cloud', 'x-adobe-app-id': 'AUSST_4_0'}
 
+
 class CreativeCloudFeed(Processor):
     """Fetch information about product(s) from the Creative Cloud products feed."""
     description = __doc__
@@ -49,7 +50,8 @@ class CreativeCloudFeed(Processor):
         "channels": {
             "required": False,
             "default": "ccp_hd_2,sti",
-            "description": "The update feed channel(s), comma separated. (default is the ccp_hd_2 and sti channels). The first channel will be used to fetch application info",
+            "description": "The update feed channel(s), comma separated. (default is the ccp_hd_2 and sti channels). \
+            The first channel will be used to fetch application info",
         },
         "platforms": {
             "required": False,

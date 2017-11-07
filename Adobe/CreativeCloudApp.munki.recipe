@@ -13,6 +13,9 @@
             <!-- FETCH_ICON: set to 'true' to fetch an icon as Icon.png in the cache dir -->
             <key>FETCH_ICON</key>
             <string>false</string>
+            <!-- FETCH_RELEASE_NOTES: set to 'true' to fetch release notes which are set as an output variable of 'release_notes' -->
+            <key>FETCH_RELEASE_NOTES</key>
+            <string>false</string>
             <!-- pkginfo: supply for example your own description, category, etc.
                  The following elements are set automatically according to Adobe's package metadata,
                  however you may still override them yourself:
