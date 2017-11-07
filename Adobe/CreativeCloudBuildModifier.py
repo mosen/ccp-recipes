@@ -64,9 +64,11 @@ class CreativeCloudBuildModifier(Processor):
         },
         "suppress_ccda": {
             "description": "Suppress the installation of Creative Cloud Desktop Application.",
+            "required": False,
             "default": True
         }
     }
+    output_variables = {}
 
     def _addPackage(self, parent, name):
         """Add a package element w/name to a set"""
@@ -80,21 +82,42 @@ class CreativeCloudBuildModifier(Processor):
         pkg_set_name = ElementTree.SubElement(pkg_set, 'name')
         pkg_set_name.text = set_name
 
-        pkgs = ElementTree.SubElement(parent, 'packages')
+        pkgs = ElementTree.SubElement(pkg_set, 'packages')
         for pkg_name in package_names:
             self._addPackage(pkgs, pkg_name)
 
-    def _suppressCcda(self, option_xml):
-        """Suppress the CCDA from being installed."""
-        acc = option_xml.find('ACC')
-        if acc is None:
-            raise ProcessorError('Unexpected: element ACC doesnt exist in the optionXML.xml')
+    def _addOverrides(self, aam_info):
+        """Add the overrideXML parts for disabling CCDA"""
+        overridexml = ElementTree.SubElement(aam_info, 'overrideXML')
+        override_app = ElementTree.SubElement(overridexml, 'application')
+        package_sets = ElementTree.SubElement(override_app, 'packageSets')
 
-        acc.set('suppress', 'true')
-
-        package_sets = option_xml.find('packageSets')
         for sap, packages in ACC_PACKAGE_SETS.items():
             self._addPackageSet(package_sets, sap, packages)
+
+    def _suppressCcda(self, root):
+        """Suppress the CCDA from being installed."""
+        acc = root.find('.//Configurations/SuppressOptions/ACC')
+        if acc is None:
+            raise ProcessorError('Expected to find element .//Configurations/SuppressOptions/ACC')
+
+        acc_suppressed = acc.get('suppress')
+        self.output('Creative Cloud Desktop Application (ACC) suppressed? {}'.format(acc_suppressed))
+
+        if acc_suppressed == 'true':
+            self.output('Already suppressed, no changes required.')
+        else:
+            self.output('Setting ACC suppress to True')
+            acc.set('suppress', 'true')
+
+        aam_info = root.find('.//AAMInfo')
+
+        package_sets = root.find('.//AAMInfo/overrideXML/application/packageSets')
+        if package_sets is None:
+            self.output('Need to add overrides for ACC')
+            self._addOverrides(aam_info)
+
+        return root
 
     def main(self):
         if not os.path.exists(self.env['pkg_path']):
@@ -102,9 +125,15 @@ class CreativeCloudBuildModifier(Processor):
 
         option_xml_path = os.path.join(self.env['pkg_path'], 'Contents', 'Resources', 'optionXML.xml')
         option_xml = ElementTree.parse(option_xml_path)
+        root = option_xml.getroot()
 
         if self.env.get('suppress_ccda', False):
-            self._suppressCcda(option_xml)
+            modified_root = self._suppressCcda(root)
+
+            with open(option_xml_path, 'w+') as fd:
+                fd.write(ElementTree.dump(modified_root))
+
+            self.output('OptionXML modified')
 
 
 if __name__ == "__main__":
