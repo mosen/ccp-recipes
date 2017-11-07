@@ -10,6 +10,9 @@
         <dict>
             <key>MUNKI_REPO_SUBDIR</key>
             <string>apps/AdobeCC</string>
+            <!-- FETCH_ICON: set to 'true' to fetch an icon as Icon.png in the cache dir -->
+            <key>FETCH_ICON</key>
+            <string>false</string>
             <!-- pkginfo: supply for example your own description, category, etc.
                  The following elements are set automatically according to Adobe's package metadata,
                  however you may still override them yourself:

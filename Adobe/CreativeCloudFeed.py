@@ -255,7 +255,7 @@ class CreativeCloudFeed(Processor):
 
             self.env['icon_url'] = largest_icon_url
 
-        if 'icon_url' in self.env and self.env.get('fetch_icon', False):
+        if 'icon_url' in self.env and self.env.get('fetch_icon', 'false').lower() == 'true':
             self.output('Fetching icon from {}'.format(self.env['icon_url']))
             req = urllib2.Request(self.env['icon_url'], headers=HEADERS)
             content = urllib2.urlopen(req).read()

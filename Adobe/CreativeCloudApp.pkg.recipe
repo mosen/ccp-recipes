@@ -28,6 +28,8 @@ Other Input values here correspond to options provided in the CCP UI.</string>
         <dict>
             <key>NAME</key>
             <string>CreativeCloudApp</string>
+            <key>FETCH_ICON</key>
+            <string>false</string>
             <key>ccpinfo</key>
             <dict>
                 <!-- Boolean flags -->
@@ -83,6 +85,11 @@ Other Input values here correspond to options provided in the CCP UI.</string>
             <dict>
                 <key>Processor</key>
                 <string>CreativeCloudFeed</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>fetch_icon</key>
+                    <string>%FETCH_ICON%</string>
+                </dict>
             </dict>
             <dict>
                 <key>Processor</key>
