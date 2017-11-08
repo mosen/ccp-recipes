@@ -242,14 +242,17 @@ class CreativeCloudVersioner(Processor):
         
         pkginfo = {
             'display_name': self.env["display_name"],
-            'minimum_os_version': self.env["minimum_os_version"],
-            'installs': [{
+            'minimum_os_version': self.env["minimum_os_version"]
+        }
+
+        # Allow the user to provide an installs array that prevents CreativeCloudVersioner from overriding it.
+        if 'pkginfo' not in self.env or 'installs' not in self.env['pkginfo']:
+            pkginfo['installs'] = [{
                 'CFBundleShortVersionString': self.env['version'],
                 'path': installed_path,
                 'type': 'application',
                 'version_comparison_key': 'CFBundleShortVersionString',
             }]
-        }
 
         self.env["additional_pkginfo"] = pkginfo
         self.output("additional_pkginfo: %s" % self.env["additional_pkginfo"])
