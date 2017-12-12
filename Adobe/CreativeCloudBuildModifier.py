@@ -95,6 +95,32 @@ class CreativeCloudBuildModifier(Processor):
         for sap, packages in ACC_PACKAGE_SETS.items():
             self._addPackageSet(package_sets, sap, packages)
 
+
+    # <ACCPanelMaskingConfig>
+    # <config>
+    #     <panel>
+    #         <name>AppsPanel</name>
+    #         <visible>false</visible>
+    #     </panel>
+    #     <feature>
+    #       <name>SelfServeInstalls</name>
+    #       <enabled>false</enabled>
+    #     </feature>
+    # </config>
+    # </ACCPanelMaskingConfig>
+    def _addPanelMasking(self, root):
+        """Disable the apps and updates panels.
+
+        AppsPanel = false
+        SelfServeInstalls = false
+        """
+        panels = root.findall('.//Configurations/ACCPanelMaskingConfig/config')
+
+        for panel_or_feature in panels:
+            self.output(panel_or_feature)
+        return root
+
+
     def _suppressCcda(self, root):
         """Suppress the CCDA from being installed."""
         acc = root.find('.//Configurations/SuppressOptions/ACC')
@@ -142,6 +168,7 @@ class CreativeCloudBuildModifier(Processor):
 
         if self.env.get('suppress_ccda', False):
             modified_root = self._suppressCcda(root)
+            modified_root = self._addPanelMasking(modified_root)
 
             with open(option_xml_path, 'wb') as fd:
                 fd.write(ElementTree.tostring(modified_root))
