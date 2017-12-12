@@ -134,6 +134,8 @@ class CreativeCloudBuildModifier(Processor):
             remove_pkg = acc_packageset.find("./package[name='{}']".format(to_remove))
             if remove_pkg:
                 self.output('Removing package {}'.format(to_remove))
+            else:
+                self.output('Could not find package "{}" to remove.'.format(to_remove))
 
     # <ACCPanelMaskingConfig>
     # <config>
