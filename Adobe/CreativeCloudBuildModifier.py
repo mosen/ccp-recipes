@@ -110,6 +110,19 @@ class CreativeCloudBuildModifier(Processor):
             self.output('Setting ACC suppress to True')
             acc.set('suppress', 'true')
 
+        update = root.find('.//Configurations/SuppressOptions/Update')
+        if update is None:
+            raise ProcessorError('Expected to find element .//Configurations/SuppressOptions/Update')
+
+        update_suppressed = update.get('isEnabled')
+        self.output('User initiated updates suppressed? {}'.format(update_suppressed))
+
+        if update_suppressed == '1':
+            self.output('Already suppressed, no changes required.')
+        else:
+            self.output('Setting Update isEnabled to 0')
+            update.set('isEnabled', '0')
+
         aam_info = root.find('.//AAMInfo')
 
         package_sets = root.find('.//AAMInfo/overrideXML/application/packageSets')
