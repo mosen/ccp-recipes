@@ -135,7 +135,7 @@ class CreativeCloudBuildModifier(Processor):
             if remove_pkg is not None:
                 self.output('Removing package {}'.format(to_remove))
                 self.output(remove_pkg)
-                asu_appinfo_root.remove(remove_pkg)
+                acc_packageset.remove(remove_pkg)
             else:
                 self.output('Could not find package "{}" to remove.'.format(to_remove))
 
