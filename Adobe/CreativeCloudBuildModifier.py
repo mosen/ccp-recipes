@@ -144,6 +144,9 @@ class CreativeCloudBuildModifier(Processor):
             else:
                 self.output('Could not find package "{}" to remove.'.format(to_remove))
 
+        with open(asu_appinfo_path, 'wb') as fd:
+            fd.write(ElementTree.tostring(asu_appinfo_root))
+
     # <ACCPanelMaskingConfig>
     # <config>
     #     <panel>
