@@ -95,6 +95,15 @@ class CreativeCloudBuildModifier(Processor):
         for sap, packages in ACC_PACKAGE_SETS.items():
             self._addPackageSet(package_sets, sap, packages)
 
+    def _removeASUPackages(self):
+        """Remove ASU packages"""
+        asu_appinfo_path = os.path.join(self.env['pkg_path'], 'Contents', 'Resources', 'ASU', 'packages',
+                                        'ApplicationInfo.xml')
+        asu_appinfo = ElementTree.parse(asu_appinfo_path)
+        asu_appinfo_root = asu_appinfo.getroot()
+
+        acc_packageset = asu_appinfo_root.find(".//packageSet[name='ACC']")
+        self.output(acc_packageset)
 
     # <ACCPanelMaskingConfig>
     # <config>
@@ -169,6 +178,8 @@ class CreativeCloudBuildModifier(Processor):
         if self.env.get('suppress_ccda', False):
             modified_root = self._suppressCcda(root)
             modified_root = self._addPanelMasking(modified_root)
+
+            self._removeASUPackages()
 
             with open(option_xml_path, 'wb') as fd:
                 fd.write(ElementTree.tostring(modified_root))

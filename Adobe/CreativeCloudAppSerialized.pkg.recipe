@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Description</key>
+        <string>Build and import a Serialized Creative Cloud Application (without CCDA) into munki</string>
+        <key>Identifier</key>
+        <string>com.github.mosen.pkg.Adobe.CreativeCloudAppSerialized</string>
+        <key>Input</key>
+        <dict>
+        </dict>
+        <key>MinimumVersion</key>
+        <string>1.0.0</string>
+        <key>ParentRecipe</key>
+        <string>com.github.mosen.pkg.Adobe.CreativeCloudApp</string>
+        <key>Process</key>
+        <array>
+            <!-- Build the installer DMG for Munki containing the entire Build directory,
+            so that items like the .ccp file persists with the installer. This may be
+            useful for auditing purposes later. -->
+            <dict>
+                <key>Processor</key>
+                <string>CreativeCloudBuildModifier</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>suppress_ccda</key>
+                    <true/>
+                </dict>
+            </dict>
+            <dict>
+                <key>Processor</key>
+                <string>DmgCreator</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>dmg_root</key>
+                    <string>%pkg_path%</string>
+                    <key>dmg_path</key>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Install-%user_facing_version%.dmg</string>
+                </dict>
+            </dict>
+            <dict>
+                <key>Processor</key>
+                <string>DmgCreator</string>
+                <key>Arguments</key>
+                <dict>
+                    <key>dmg_root</key>
+                    <string>%uninstaller_pkg_path%</string>
+                    <key>dmg_path</key>
+                    <string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%user_facing_version%.dmg</string>
+                </dict>
+            </dict>
+        </array>
+    </dict>
+</plist>
