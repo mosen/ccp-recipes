@@ -102,9 +102,14 @@ class CreativeCloudBuildModifier(Processor):
         asu_appinfo = ElementTree.parse(asu_appinfo_path)
         asu_appinfo_root = asu_appinfo.getroot()
 
-        acc_packageset = asu_appinfo_root.find(".//packageSet[name='ACC']")
+        acc_packageset = asu_appinfo_root.find(".//packageSet[name='ACC']/packages")
         if acc_packageset is None:
             raise ProcessorError('Tried to modify ACC installation, but no packageSet element was found. This should' +
+                                 'never happen')
+
+        adc_packageset = asu_appinfo_root.find(".//packageSet[name='ADC']/packages")
+        if adc_packageset is None:
+            raise ProcessorError('Tried to modify ACC(ADC) installation, but no packageSet element was found. This should' +
                                  'never happen')
 
         packages_to_remove = [
