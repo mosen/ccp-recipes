@@ -103,7 +103,37 @@ class CreativeCloudBuildModifier(Processor):
         asu_appinfo_root = asu_appinfo.getroot()
 
         acc_packageset = asu_appinfo_root.find(".//packageSet[name='ACC']")
-        self.output(acc_packageset)
+        if acc_packageset is None:
+            raise ProcessorError('Tried to modify ACC installation, but no packageSet element was found. This should' +
+                                 'never happen')
+
+        packages_to_remove = [
+            'ACCC',
+            'Utils',
+            'CoreSync',
+            'CoreSyncExtension',
+            'LiveType',
+            'ExchangePlugin',
+            'DesignLibraryPlugin',
+            'SynKit',
+            'CCSyncPlugin',
+            'CCLibrary',
+            'HomePanel',
+            'AssetsPanel',
+            'FilesPanel',
+            'FontsPanel',
+            'MarketPanel',
+            'BehancePanel',
+            'SPanel',
+            'CCXProcess'
+        ]
+
+        # also remove package 'ADC' from 'ADC' set
+
+        for to_remove in packages_to_remove:
+            remove_pkg = acc_packageset.find("./package[name='{}']".format(to_remove))
+            if remove_pkg:
+                self.output('Removing package {}'.format(to_remove))
 
     # <ACCPanelMaskingConfig>
     # <config>
