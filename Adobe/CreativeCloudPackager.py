@@ -124,13 +124,21 @@ class CreativeCloudPackager(Processor):
         # params = self.automation_manifest_from_ccpinfo()
         params = dict(self.env['ccpinfo'])
 
+        # 1. If any specified product has version 'latest' then IncludeUpdates is true, and CCP will fetch the latest
+        # available product update.
+        # 2. If you specified IncludeUpdates then that value will be used
+        # 3. Otherwise, You only get the baseVersion you entered.
+        if all([product.get('version', None) == 'latest' for product in self.env['ccpinfo']['Products']]):
+            params['IncludeUpdates'] = True
+        else:
+            params['IncludeUpdates'] = params.get('IncludeUpdates', False)
+
         # add additional parameters for which there's no need for the user to
         # supply in the 'ccpinfo' input
         params.update({
             'packageName': self.env['package_name'],
             'outputLocation': self.env['RECIPE_CACHE_DIR'],
             'packaging_job_id': str(uuid.uuid4()),
-            'IncludeUpdates': False,
             'is64Bit': True,
         })
 
@@ -170,7 +178,7 @@ class CreativeCloudPackager(Processor):
             sap = ElementTree.Element('sapCode')
             sap.text = prod['sapCode']
             ver = ElementTree.Element('version')
-            ver.text = prod['version']
+            ver.text = prod['baseVersion']
             product.append(sap)
             product.append(ver)
             products.append(product)
