@@ -38,6 +38,7 @@ UPDATE_DESC_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/co
 UPDATE_FEED_URL_MAC = 'https://swupmf.adobe.com/webfeed/oobe/aam20/mac/updaterfeed.xml'
 HEADERS = {'User-Agent': 'Creative Cloud', 'x-adobe-app-id': 'AUSST_4_0'}
 
+
 class CreativeCloudFeed(Processor):
     """Fetch information about product(s) from the Creative Cloud products feed."""
     description = __doc__
@@ -48,8 +49,9 @@ class CreativeCloudFeed(Processor):
         },
         "channels": {
             "required": False,
-            "default": "ccm,sti",
-            "description": "The update feed channel(s), comma separated. (default is the ccm and sti channels)",
+            "default": "ccp_hd_2,sti",
+            "description": "The update feed channel(s), comma separated. (default is the ccp_hd_2 and sti channels). \
+            The first channel will be used to fetch application info",
         },
         "platforms": {
             "required": False,
@@ -240,6 +242,7 @@ class CreativeCloudFeed(Processor):
         """Fetch extended information about a product such as: manifest,
         proxy (if available), release notes, and icon"""
         extended_info = {}
+        channels = string.split(self.env.get('channels'), ',')
 
         # Fetch Icon
         if 'productIcons' in product:
@@ -254,7 +257,7 @@ class CreativeCloudFeed(Processor):
 
             self.env['icon_url'] = largest_icon_url
 
-        if 'icon_url' in self.env and self.env.get('fetch_icon', False):
+        if 'icon_url' in self.env and self.env.get('fetch_icon', 'false').lower() == 'true':
             self.output('Fetching icon from {}'.format(self.env['icon_url']))
             req = urllib2.Request(self.env['icon_url'], headers=HEADERS)
             content = urllib2.urlopen(req).read()
@@ -264,13 +267,13 @@ class CreativeCloudFeed(Processor):
 
             extended_info['icon_path'] = '{}/Icon.png'.format(self.env['RECIPE_CACHE_DIR'])
         else:
-            self.output('An icon was requested but we were unable to download one.')
+            self.output('An icon was not requested or the url did not exist.')
             extended_info['icon_path'] = ''
 
         # Fetch Manifest + Proxy
         if 'urls' in platform['languageSet'][0] and 'manifestURL' in platform['languageSet'][0]['urls']:
             extended_info['manifest_url'] = '{}{}'.format(
-                cdn['ccm']['secure'],
+                cdn[channels[0]]['secure'],
                 platform['languageSet'][0]['urls'].get('manifestURL')
             )
 
@@ -289,7 +292,7 @@ class CreativeCloudFeed(Processor):
             self.output('Did not find a manifest.xml in the product json data')
 
         # Fetch Release Notes
-        if self.env.get('fetch_release_notes', False):
+        if self.env.get('fetch_release_notes', 'false').lower() == 'true':
             self.output('Processor will fetch update release notes')
             desc = self.fetch_release_notes(product['id'], product['version'], 'osx10-64', 'en_US')
             rn_etree = ElementTree.fromstring(desc)

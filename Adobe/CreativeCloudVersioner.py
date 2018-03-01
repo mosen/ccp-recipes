@@ -100,7 +100,7 @@ class CreativeCloudVersioner(Processor):
             # Acrobat is a "current" title with a PKG installer we can extract needed
             # metadata from
             if self.env["sapCode"] != "APRO":
-                raise ProcessorError("RIBS or legacy installer detected")
+                self.process_ribs_installer(self.env['pkg_path'], sap_code_hint=self.env['sapCode'])
             else:
                 self.env["proxy_xml"] = os.path.join(self.env["pkg_path"], "Contents/Resources/Setup", self.env["sapCode"] + self.env["ccpVersion"], "proxy.xml")
                 if not os.path.exists(self.env["proxy_xml"]):
@@ -203,6 +203,32 @@ class CreativeCloudVersioner(Processor):
                 # Now we have the deets, let's use them
                 self.create_pkginfo(app_bundle, app_version, installed_path)
 
+    def process_ribs_installer(self, pkg_path, sap_code_hint=None):
+        """Extract version number of RIBS based package.
+
+        Args:
+            pkg_path (str): Path to the package that was produced
+            sap_code_hint (str): hint the sap code of the "main" package, to extract the version from.
+        """
+        option_xml_path = os.path.join(pkg_path, 'Contents', 'Resources', 'optionXML.xml')
+        # ribs_root = os.path.join(pkg_path, 'Contents', 'Resources', 'Setup')
+
+        option_xml = ElementTree.parse(option_xml_path)
+        main_media = None
+        for media in option_xml.findall('.//Medias/Media'):  # Media refers to RIBS media only. HD is in HDMedia
+            if media.findtext('SAPCode') == sap_code_hint:
+                main_media = media
+                break
+
+        if main_media is None:
+            raise ProcessorError('Could not find main RIBS package indicated by SAP Code {}'.format(sap_code_hint))
+
+        # media_path = os.path.join(ribs_root, main_media.findtext('TargetFolderName'))
+        # if not os.path.exists(media_path):
+        #     raise ProcessorError('Could not find Media for RIBS package in path: {}'.format(media_path))
+
+        self.create_pkginfo('NOT_SUPPORTED', main_media.findtext('prodVersion'), '')
+
     def create_pkginfo(self, app_bundle, app_version, installed_path):
         """Create pkginfo with found details
 
@@ -216,14 +242,17 @@ class CreativeCloudVersioner(Processor):
         
         pkginfo = {
             'display_name': self.env["display_name"],
-            'minimum_os_version': self.env["minimum_os_version"],
-            'installs': [{
+            'minimum_os_version': self.env["minimum_os_version"]
+        }
+
+        # Allow the user to provide an installs array that prevents CreativeCloudVersioner from overriding it.
+        if 'pkginfo' not in self.env or 'installs' not in self.env['pkginfo']:
+            pkginfo['installs'] = [{
                 'CFBundleShortVersionString': self.env['version'],
                 'path': installed_path,
                 'type': 'application',
                 'version_comparison_key': 'CFBundleShortVersionString',
             }]
-        }
 
         self.env["additional_pkginfo"] = pkginfo
         self.output("additional_pkginfo: %s" % self.env["additional_pkginfo"])
