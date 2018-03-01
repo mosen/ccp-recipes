@@ -294,11 +294,14 @@ class CreativeCloudPackager(Processor):
         automation_manifest_plist_path = os.path.join(expected_output_root,
                                                       '.autopkg_manifest.plist')
         self.set_customer_type(self.env['ccpinfo'])
+
+        # ccpinfo Needs pre-processing before comparison to old run
+        new_manifest = self.automation_xml()
+
         # Handle any pre-existing package at the expected location, and end early if it matches our
         # input manifest
         if os.path.exists(automation_manifest_plist_path):
             existing_manifest = FoundationPlist.readPlist(automation_manifest_plist_path)
-            new_manifest = self.env['ccpinfo']
             self.output("Found existing CCP package build automation info, comparing")
             self.output("existing build: %s" % existing_manifest)
             self.output("current build: %s" % new_manifest)
@@ -314,12 +317,11 @@ class CreativeCloudPackager(Processor):
         if os.path.isdir(expected_output_root):
             shutil.rmtree(expected_output_root)
 
-        xml_data = self.automation_xml()
         # using .xml as a suffix because CCP's automation mode creates a '<input>_results.xml' file with the assumption
         # that the input ends in '.xml'
         xml_path = os.path.join(xml_workdir, 'ccp_automation_%s.xml' % self.env['package_name'])
         with open(xml_path, 'w') as fd:
-            fd.write(xml_data)
+            fd.write(new_manifest)
 
         if self.is_ccp_running():
             raise ProcessorError(
