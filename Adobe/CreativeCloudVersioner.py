@@ -90,10 +90,11 @@ class CreativeCloudVersioner(Processor):
         self.env["app_json"] = os.path.join(self.env["pkg_path"], "Contents/Resources/HD", self.env["sapCode"] + self.env["ccpVersion"], "Application.json")
         # If Application.json exists, we"re looking at a HD installer
         if os.path.exists(self.env["app_json"]):
+            self.output("Installer is HyperDrive")
             self.output("app_json: %s" % self.env["app_json"])
             self.process_hd_installer()
         else:
-            self.output("Assuming RIBS installer since path does not exist: {}".format(self.env["app_json"]))
+            self.output("Installer is RIBS, since path does not exist: {}".format(self.env["app_json"]))
             # If not a HD installer
             # Legacy Installers: PKG"s but for old titles
             # RIBS: SPGD, LTRM, FLBR, KETK
