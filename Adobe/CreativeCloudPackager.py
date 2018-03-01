@@ -130,6 +130,7 @@ class CreativeCloudPackager(Processor):
         # 3. Otherwise, You only get the baseVersion you entered.
         if 'IncludeUpdates' not in params:
             if any([product.get('version', None) == 'latest' for product in self.env['ccpinfo']['Products']]):
+                self.output("At least one product has version = latest. This means we are enabling IncludeUpdates for CCP")
                 params['IncludeUpdates'] = True
             else:
                 params['IncludeUpdates'] = False
