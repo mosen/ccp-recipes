@@ -93,6 +93,7 @@ class CreativeCloudVersioner(Processor):
             self.output("app_json: %s" % self.env["app_json"])
             self.process_hd_installer()
         else:
+            self.output("Assuming RIBS installer since path does not exist: {}".format(self.env["app_json"]))
             # If not a HD installer
             # Legacy Installers: PKG"s but for old titles
             # RIBS: SPGD, LTRM, FLBR, KETK
