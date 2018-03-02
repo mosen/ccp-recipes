@@ -379,6 +379,7 @@ class CreativeCloudFeed(Processor):
                                                                         product.get('version')))
 
             product_info['version'] = product['version']
+            product_info['requestedVersion'] = version
             products.append(product)
             self.cache_product_info(product_info, product)
 
