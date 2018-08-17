@@ -46,6 +46,8 @@
 					<string>%pkg_path%</string>
 					<key>destination_path</key>
 					<string>%RECIPE_CACHE_DIR%/%NAME%_Install-%version%.pkg</string>
+                    <key>overwrite</key>
+                    <true/>
 				</dict>
 			</dict>
             <dict>
@@ -100,6 +102,8 @@
 					<string>%uninstaller_pkg_path%</string>
 					<key>destination_path</key>
 					<string>%RECIPE_CACHE_DIR%/%NAME%_Uninstall-%version%.pkg</string>
+                    <key>overwrite</key>
+                    <true/>
 				</dict>
 			</dict>
             <dict>
