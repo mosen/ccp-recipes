@@ -83,6 +83,10 @@ class CreativeCloudPackager(Processor):
             "required": True,
             "description": "The output package name",
         },
+        "version": {
+            "required": False,
+            "description": "The expected output version, from CreativeCloudFeed Processor"
+        }
     }
 
     output_variables = {
@@ -128,6 +132,7 @@ class CreativeCloudPackager(Processor):
         # 2. If any specified product has version 'latest' then IncludeUpdates is true, and CCP will fetch the latest
         # available product update.
         # 3. Otherwise, You only get the baseVersion you entered.
+        # NOTE: Adobe took away the ability to specify any version. We can now only have the base version or latest.
         if 'IncludeUpdates' not in params:
             if any([product.get('requestedVersion', None) == 'latest' for product in params['Products']]):
                 self.output("At least one product has requested version 'latest'. This means we are enabling IncludeUpdates for CCP")
@@ -180,7 +185,8 @@ class CreativeCloudPackager(Processor):
             sap = ElementTree.Element('sapCode')
             sap.text = prod['sapCode']
             ver = ElementTree.Element('version')
-            ver.text = prod['baseVersion']
+            # Some products, such as Acrobat, only have a version not a base version
+            ver.text = prod['baseVersion'] if len(prod['baseVersion']) > 0 else prod['version']
             product.append(sap)
             product.append(ver)
             products.append(product)
@@ -296,6 +302,7 @@ class CreativeCloudPackager(Processor):
         self.set_customer_type(self.env['ccpinfo'])
 
         # ccpinfo Needs pre-processing before comparison to old run
+        self.output("Generating Automation XML")
         new_manifest = self.automation_xml()
 
         # Handle any pre-existing package at the expected location, and end early if it matches our
