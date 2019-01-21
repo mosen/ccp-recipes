@@ -21,8 +21,9 @@ import unicodedata
 import urllib2
 from urllib import urlencode
 
-CCM_URL = 'https://prod-rel-ffc-ccm.oobesaas.adobe.com/adobe-ffc-external/core/v4/products/all'
-BASE_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/aamee/v2/products/all'
+BASE_URL = 'https://prod-rel-ffc-ccm.oobesaas.adobe.com/adobe-ffc-external/core/v4/products/all'
+AAMEE_BASE_URL = 'https://prod-rel-ffc.oobesaas.adobe.com/adobe-ffc-external/aamee/v2/products/all'
+
 
 def add_product(products, product):
     if product['id'] not in products:
@@ -78,7 +79,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == 'dump':
         dump(['ccp_hd_2', 'sti'], ['osx10', 'osx10-64'])
     else:
-        data = fetch(['ccp_hd_2', 'sti'], ['osx10', 'osx10-64'])
+        #data = fetch(['ccp_hd_2', 'sti'], ['osx10', 'osx10-64'])
+        data = fetch(['ccm', 'sti', 'services'], ['osx10', 'osx10-64'])
         products = {}
         for channel in data['channel']:
             for product in channel['products']['product']:
